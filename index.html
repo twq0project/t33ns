@@ -2564,13 +2564,14 @@ const AR = {
 // VOSTOK 1 — 3D MODEL (Three.js)
 // ════════════════════════════════════════════
 let vostokReady = false;
-let vostokRenderer, vostokScene, vostokCamera, vostokShip;
+let vostokRenderer, vostokScene, vostokCamera, vostokShip, vostokEarth, vostokEngineGlow;
 let vostokAnimId = null;
 let vostokDrag = { active: false, prevX: 0, prevY: 0 };
-let vostokRot = { x: 0.25, y: 0.6 };
+let vostokRot = { x: 0.18, y: 0.6 };
 let vostokZoom = 7;
 let vostokAutoSpin = true;
 let vostokLastTouchDist = 0;
+let vostokClock = 0;
 
 function initVostok() {
   if (vostokReady) { if (vostokAnimId === null) vostokAnimate(); return; }
@@ -2586,216 +2587,280 @@ function initVostok() {
   const canvas = document.getElementById('vostok-canvas');
   const wrap = canvas.parentElement;
   const rect = wrap.getBoundingClientRect();
-  const W = rect.width || canvas.offsetWidth || 600;
-  const H = rect.height || canvas.offsetHeight || 500;
+  const W = rect.width || 600;
+  const H = rect.height || 500;
 
-  vostokRenderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  vostokRenderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
   vostokRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   vostokRenderer.setSize(W, H);
+  vostokRenderer.setClearColor(0x020610, 1);
+  vostokRenderer.shadowMap.enabled = true;
+  vostokRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   vostokScene = new THREE.Scene();
 
-  // Stars
-  const starPts = [];
-  for (let i = 0; i < 2400; i++) {
-    const r = 80 + Math.random() * 120;
-    const theta = Math.random() * Math.PI * 2;
-    const phi = Math.acos(2 * Math.random() - 1);
-    starPts.push(r * Math.sin(phi) * Math.cos(theta), r * Math.cos(phi), r * Math.sin(phi) * Math.sin(theta));
-  }
-  const starGeo = new THREE.BufferGeometry();
-  starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPts, 3));
-  vostokScene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.4, sizeAttenuation: true })));
+  // ── Stars (color-varied) ──
+  (function () {
+    const pos = [], col = [];
+    for (let i = 0; i < 3200; i++) {
+      const r = 100 + Math.random() * 150;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      pos.push(r * Math.sin(phi) * Math.cos(theta), r * Math.cos(phi), r * Math.sin(phi) * Math.sin(theta));
+      const warm = Math.random() < 0.12;
+      col.push(warm ? 1 : 0.82 + Math.random() * 0.18, warm ? 0.8 + Math.random() * 0.2 : 0.9 + Math.random() * 0.1, warm ? 0.55 : 1);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+    vostokScene.add(new THREE.Points(g, new THREE.PointsMaterial({ size: 0.45, sizeAttenuation: true, vertexColors: true, transparent: true, opacity: 0.92 })));
+  })();
 
-  // Camera
+  // ── Earth ──
+  (function () {
+    const c = document.createElement('canvas');
+    c.width = 1024; c.height = 512;
+    const ctx = c.getContext('2d');
+    // Ocean
+    const og = ctx.createLinearGradient(0, 0, 0, 512);
+    og.addColorStop(0, '#05122a'); og.addColorStop(0.35, '#0c2454'); og.addColorStop(0.5, '#1438 78'); og.addColorStop(0.65, '#0c2454'); og.addColorStop(1, '#05122a');
+    ctx.fillStyle = '#0c2454'; ctx.fillRect(0, 0, 1024, 512);
+    // Lat/lon grid
+    ctx.strokeStyle = 'rgba(60,110,200,0.1)'; ctx.lineWidth = 0.6;
+    for (let i = 0; i <= 18; i++) { ctx.beginPath(); ctx.moveTo(i * 1024 / 18, 0); ctx.lineTo(i * 1024 / 18, 512); ctx.stroke(); }
+    for (let i = 0; i <= 9; i++) { ctx.beginPath(); ctx.moveTo(0, i * 512 / 9); ctx.lineTo(1024, i * 512 / 9); ctx.stroke(); }
+    // Land
+    function blob(x, y, rx, ry, color) { ctx.save(); ctx.fillStyle = color; ctx.beginPath(); ctx.translate(x, y); ctx.scale(rx, ry); ctx.arc(0, 0, 1, 0, Math.PI * 2); ctx.restore(); ctx.fill(); }
+    blob(540, 155, 140, 52, '#1a4820'); blob(640, 128, 75, 38, '#204e28'); blob(690, 148, 58, 32, '#1a4820');
+    blob(495, 252, 46, 78, '#1a4820'); blob(502, 225, 32, 28, '#204e28');
+    blob(200, 145, 58, 72, '#1a4820'); blob(180, 112, 38, 28, '#204e28');
+    blob(228, 298, 36, 68, '#1a4820');
+    blob(728, 298, 44, 30, '#1a4820');
+    // Ice caps
+    const np = ctx.createLinearGradient(0, 0, 0, 58); np.addColorStop(0, 'rgba(185,205,255,0.82)'); np.addColorStop(1, 'rgba(185,205,255,0)'); ctx.fillStyle = np; ctx.fillRect(0, 0, 1024, 58);
+    const sp = ctx.createLinearGradient(0, 455, 0, 512); sp.addColorStop(0, 'rgba(185,205,255,0)'); sp.addColorStop(1, 'rgba(185,205,255,0.88)'); ctx.fillStyle = sp; ctx.fillRect(0, 455, 1024, 57);
+    // Clouds
+    ctx.fillStyle = 'rgba(255,255,255,0.07)';
+    [[200,120,90,14],[450,85,110,12],[750,110,85,16],[120,230,100,12],[630,320,95,13],[350,380,80,10]].forEach(([x,y,w,h]) => { ctx.beginPath(); ctx.ellipse(x,y,w,h,0,0,Math.PI*2); ctx.fill(); });
+    const earthTex = new THREE.CanvasTexture(c);
+    const eR = 22;
+    vostokEarth = new THREE.Group();
+    vostokEarth.add(new THREE.Mesh(new THREE.SphereGeometry(eR, 64, 64), new THREE.MeshStandardMaterial({ map: earthTex, roughness: 0.82, metalness: 0 })));
+    // Atmosphere layers
+    vostokEarth.add(new THREE.Mesh(new THREE.SphereGeometry(eR * 1.022, 48, 48), new THREE.MeshPhongMaterial({ color: 0x2255ff, transparent: true, opacity: 0.11, side: THREE.BackSide })));
+    vostokEarth.add(new THREE.Mesh(new THREE.SphereGeometry(eR * 1.055, 48, 48), new THREE.MeshPhongMaterial({ color: 0x5588ff, transparent: true, opacity: 0.04, side: THREE.BackSide })));
+    vostokEarth.position.set(-9, -30, -36);
+    vostokEarth.rotation.z = 0.28;
+    vostokScene.add(vostokEarth);
+  })();
+
+  // ── Camera ──
   vostokCamera = new THREE.PerspectiveCamera(42, W / H, 0.1, 800);
   vostokCamera.position.set(0, 0, vostokZoom);
 
-  // Lighting
-  vostokScene.add(new THREE.AmbientLight(0x223355, 1.1));
-  const sun = new THREE.DirectionalLight(0xfff4e0, 3);
-  sun.position.set(6, 9, 5);
+  // ── Lighting ──
+  vostokScene.add(new THREE.AmbientLight(0x18253d, 1.8));
+  const sun = new THREE.DirectionalLight(0xfff7e8, 3.8);
+  sun.position.set(8, 11, 6);
+  sun.castShadow = true;
   vostokScene.add(sun);
-  const fill = new THREE.PointLight(0x2255aa, 0.7, 40);
-  fill.position.set(-6, -4, 4);
-  vostokScene.add(fill);
-  const rim = new THREE.PointLight(0x88aaff, 0.4, 30);
-  rim.position.set(0, -8, -4);
-  vostokScene.add(rim);
+  const earthBounce = new THREE.PointLight(0x1a44aa, 0.9, 65);
+  earthBounce.position.set(-5, -20, -15);
+  vostokScene.add(earthBounce);
+  const rimLight = new THREE.PointLight(0x3366cc, 0.45, 35);
+  rimLight.position.set(-9, -6, -5);
+  vostokScene.add(rimLight);
 
-  // ── Build Vostok 1 ──
+  // ── Materials (PBR) ──
+  const mCapsule  = new THREE.MeshStandardMaterial({ color: 0xdaccb2, roughness: 0.38, metalness: 0.28 });
+  const mHeat     = new THREE.MeshStandardMaterial({ color: 0x221808, roughness: 0.96, metalness: 0.04 });
+  const mModule   = new THREE.MeshStandardMaterial({ color: 0x253220, roughness: 0.82, metalness: 0.12 });
+  const mPanel    = new THREE.MeshStandardMaterial({ color: 0x142278, roughness: 0.28, metalness: 0.55 });
+  const mPanel2   = new THREE.MeshStandardMaterial({ color: 0x0d1755, roughness: 0.28, metalness: 0.55 });
+  const mNozzle   = new THREE.MeshStandardMaterial({ color: 0x383838, roughness: 0.48, metalness: 0.72 });
+  const mNozzleIn = new THREE.MeshStandardMaterial({ color: 0x180600, roughness: 0.9, metalness: 0.2, emissive: 0x200800, emissiveIntensity: 0.5 });
+  const mRing     = new THREE.MeshStandardMaterial({ color: 0x8a9bac, roughness: 0.32, metalness: 0.78 });
+  const mAntenna  = new THREE.MeshStandardMaterial({ color: 0xe0e0e0, roughness: 0.22, metalness: 0.82 });
+  const mWindow   = new THREE.MeshStandardMaterial({ color: 0x1a4a8a, roughness: 0.0, metalness: 0.05, transparent: true, opacity: 0.82, emissive: 0x0a1f44, emissiveIntensity: 0.3 });
+  const mStrut    = new THREE.MeshStandardMaterial({ color: 0x4a4a4a, roughness: 0.6, metalness: 0.65 });
+
+  // ── Build ship ──
   const ship = new THREE.Group();
 
-  const matCapsule  = new THREE.MeshPhongMaterial({ color: 0xd8cdb8, specular: 0x999999, shininess: 70 });
-  const matModule   = new THREE.MeshPhongMaterial({ color: 0x2e4228, specular: 0x1a2a18, shininess: 15 });
-  const matStripe   = new THREE.MeshPhongMaterial({ color: 0x1a3a88, specular: 0x112255, shininess: 8 });
-  const matStripe2  = new THREE.MeshPhongMaterial({ color: 0x243a6a, specular: 0x112255, shininess: 8 });
-  const matNozzle   = new THREE.MeshPhongMaterial({ color: 0x444444, specular: 0x333333, shininess: 35 });
-  const matRing     = new THREE.MeshPhongMaterial({ color: 0x8899aa, specular: 0x556677, shininess: 55 });
-  const matAntenna  = new THREE.MeshPhongMaterial({ color: 0xcccccc, specular: 0x888888, shininess: 90 });
-  const matWindow   = new THREE.MeshPhongMaterial({ color: 0x1a4a8a, specular: 0x88aaff, shininess: 220, transparent: true, opacity: 0.88 });
-  const matHeat     = new THREE.MeshPhongMaterial({ color: 0x4a3a28, specular: 0x222222, shininess: 5 });
-
-  // 1. Descent sphere (Sharik) — top of craft
-  const sphere = new THREE.Mesh(new THREE.SphereGeometry(1.15, 48, 48), matCapsule);
+  // — Descent sphere (Sharik) —
+  const sphere = new THREE.Mesh(new THREE.SphereGeometry(1.15, 64, 64), mCapsule);
+  sphere.castShadow = true; sphere.receiveShadow = true;
   sphere.position.y = 1.85;
   ship.add(sphere);
+  // Heat shield (charred black bottom hemisphere)
+  const heatGeo = new THREE.SphereGeometry(1.156, 48, 24, 0, Math.PI * 2, Math.PI * 0.52, Math.PI * 0.48);
+  const heat = new THREE.Mesh(heatGeo, mHeat);
+  heat.position.y = 1.85;
+  ship.add(heat);
 
-  // Heat shield bottom half of sphere (darker ablative coating)
-  const heatShield = new THREE.Mesh(new THREE.SphereGeometry(1.16, 48, 24, 0, Math.PI * 2, Math.PI * 0.5, Math.PI * 0.5), matHeat);
-  heatShield.position.y = 1.85;
-  ship.add(heatShield);
-
-  // Porthole window
-  const pDir = new THREE.Vector3(0.9, 0.25, 0.35).normalize();
-  const pPos = new THREE.Vector3(0, 1.85, 0).add(pDir.clone().multiplyScalar(1.17));
-  const porthole = new THREE.Mesh(new THREE.CircleGeometry(0.17, 24), matWindow);
-  porthole.position.copy(pPos);
-  porthole.lookAt(pPos.clone().add(pDir));
+  // Porthole
+  const pDir = new THREE.Vector3(0.86, 0.26, 0.44).normalize();
+  const pCtr = new THREE.Vector3(0, 1.85, 0);
+  const pPos = pCtr.clone().add(pDir.clone().multiplyScalar(1.16));
+  const porthole = new THREE.Mesh(new THREE.CircleGeometry(0.16, 32), mWindow);
+  porthole.position.copy(pPos); porthole.lookAt(pPos.clone().add(pDir));
   ship.add(porthole);
-  // Porthole rim
-  const pRim = new THREE.Mesh(new THREE.RingGeometry(0.17, 0.21, 24), matRing);
-  pRim.position.copy(pPos.clone().add(pDir.clone().multiplyScalar(0.01)));
-  pRim.lookAt(pPos.clone().add(pDir));
-  ship.add(pRim);
+  [0.165, 0.205, 0.245].forEach((r, i) => {
+    const rim = new THREE.Mesh(new THREE.RingGeometry(r, r + 0.038, 32), i === 2 ? mNozzle : mRing);
+    rim.position.copy(pPos.clone().add(pDir.clone().multiplyScalar(0.005 - i * 0.003)));
+    rim.lookAt(pPos.clone().add(pDir));
+    ship.add(rim);
+  });
 
-  // 2. Separation ring
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.58, 0.055, 14, 64), matRing);
-  ring.position.y = 0.68;
-  ring.rotation.x = Math.PI / 2;
-  ship.add(ring);
-  // Bolts on ring
-  for (let i = 0; i < 14; i++) {
-    const a = (i / 14) * Math.PI * 2;
-    const bolt = new THREE.Mesh(new THREE.SphereGeometry(0.028, 7, 7), matRing);
-    bolt.position.set(Math.cos(a) * 0.58, 0.68, Math.sin(a) * 0.58);
-    ship.add(bolt);
+  // — Separation adapter —
+  ship.add(Object.assign(new THREE.Mesh(new THREE.CylinderGeometry(0.58, 0.62, 0.22, 40), mRing), { position: new THREE.Vector3(0, 0.65, 0) }));
+  for (let i = 0; i < 18; i++) {
+    const a = (i / 18) * Math.PI * 2;
+    const b = new THREE.Mesh(new THREE.CylinderGeometry(0.019, 0.019, 0.1, 7), mRing);
+    b.position.set(Math.cos(a) * 0.61, 0.65, Math.sin(a) * 0.61);
+    b.rotation.x = Math.PI / 2; b.rotation.z = -a;
+    ship.add(b);
   }
 
-  // 3. Instrument module (frustum: wide top near sphere, narrow at bottom)
-  const instrMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.58, 1.12, 2.5, 40), matModule);
-  instrMesh.position.y = -0.58;
-  ship.add(instrMesh);
+  // — Equipment module (two-section frustum for more realistic silhouette) —
+  const eq1 = new THREE.Mesh(new THREE.CylinderGeometry(0.61, 1.14, 1.55, 48), mModule);
+  eq1.position.y = -0.24; ship.add(eq1);
+  const eq2 = new THREE.Mesh(new THREE.CylinderGeometry(1.14, 1.22, 0.82, 48), mModule);
+  eq2.position.y = -1.22; ship.add(eq2);
 
-  // Longitudinal solar-panel stripes on instrument module
+  // Equipment band (instrument ports ring)
+  const band = new THREE.Mesh(new THREE.TorusGeometry(1.18, 0.042, 8, 64), mRing);
+  band.position.y = -1.0; band.rotation.x = Math.PI / 2; ship.add(band);
+  // Small ports on band
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2;
+    const port = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.06, 8), mNozzle);
+    port.position.set(Math.cos(a) * 1.2, -1.0, Math.sin(a) * 1.2);
+    port.rotation.z = Math.PI / 2; port.rotation.y = a;
+    ship.add(port);
+  }
+
+  // Thermal control panels (alternating colors, with panel frames)
   for (let i = 0; i < 10; i++) {
-    const a = (i / 10) * Math.PI * 2;
-    const mat = i % 2 === 0 ? matStripe : matStripe2;
-    const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.04, 2.4, 0.14), mat);
-    const r = 0.88;
-    stripe.position.set(Math.cos(a) * r, -0.58, Math.sin(a) * r);
-    stripe.rotation.y = -a;
-    ship.add(stripe);
+    const a = (i / 10) * Math.PI * 2 + 0.15;
+    const mat = i % 2 === 0 ? mPanel : mPanel2;
+    const r = 0.97;
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(0.055, 1.4, 0.21), mat);
+    panel.position.set(Math.cos(a) * r, -0.24, Math.sin(a) * r);
+    panel.rotation.y = -a;
+    ship.add(panel);
+    // Frame border
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(0.05, 1.44, 0.015), mRing);
+    frame.position.set(Math.cos(a) * (r + 0.033), -0.24, Math.sin(a) * (r + 0.033));
+    frame.rotation.y = -a;
+    ship.add(frame);
+    // Horizontal divider on panel
+    const div = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.012, 0.22), mRing);
+    div.position.set(Math.cos(a) * r, -0.24, Math.sin(a) * r);
+    div.rotation.y = -a;
+    ship.add(div);
   }
 
-  // 4. Retrorocket housing (bottom of instrument module)
-  const rktHousing = new THREE.Mesh(new THREE.CylinderGeometry(1.08, 0.85, 0.45, 32), matNozzle);
-  rktHousing.position.y = -1.9;
-  ship.add(rktHousing);
+  // — Retrorocket section —
+  const rktRing = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 0.92, 0.52, 40), mNozzle);
+  rktRing.position.y = -1.88; ship.add(rktRing);
+  // 4 mounting struts
+  for (let i = 0; i < 4; i++) {
+    const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
+    const st = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.5, 6), mStrut);
+    st.position.set(Math.cos(a) * 0.65, -1.88, Math.sin(a) * 0.65); ship.add(st);
+  }
+  const nSkirt = new THREE.Mesh(new THREE.CylinderGeometry(0.52, 0.7, 0.38, 32), mNozzle);
+  nSkirt.position.y = -2.27; ship.add(nSkirt);
+  const nBell = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.48, 0.52, 32), mNozzle);
+  nBell.position.y = -2.62; ship.add(nBell);
+  // Nozzle interior glow
+  const nInt = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.16, 0.1, 24), mNozzleIn);
+  nInt.position.y = -2.86; ship.add(nInt);
+  // Engine glow light (subtle pulsing in animate loop)
+  vostokEngineGlow = new THREE.PointLight(0xff4400, 0.0, 4);
+  vostokEngineGlow.position.y = -2.95;
+  ship.add(vostokEngineGlow);
 
-  // Nozzle bell
-  const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.48, 0.55, 24), matNozzle);
-  nozzle.position.y = -2.37;
-  ship.add(nozzle);
-
-  // Inner nozzle glow ring
-  const nozzleInner = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 0.1, 24), new THREE.MeshPhongMaterial({ color: 0x332200, emissive: 0x110800, shininess: 2 }));
-  nozzleInner.position.y = -2.63;
-  ship.add(nozzleInner);
-
-  // 5. Antenna array — 4 whip antennas from upper sphere
-  const sphereCenter = new THREE.Vector3(0, 1.85, 0);
-  const antDirs = [
+  // — Antenna array (4 whip + 2 comm stubs) —
+  const sCtr = new THREE.Vector3(0, 1.85, 0);
+  [
     new THREE.Vector3(0, 1, 1).normalize(),
     new THREE.Vector3(0, 1, -1).normalize(),
     new THREE.Vector3(1, 1, 0).normalize(),
     new THREE.Vector3(-1, 1, 0).normalize(),
-  ];
-  antDirs.forEach(dir => {
-    const len = 1.05;
-    const antGeo = new THREE.CylinderGeometry(0.013, 0.006, len, 6);
-    const ant = new THREE.Mesh(antGeo, matAntenna);
-    const surfPt = sphereCenter.clone().add(dir.clone().multiplyScalar(1.15));
-    ant.position.copy(surfPt.clone().add(dir.clone().multiplyScalar(len / 2)));
+  ].forEach(dir => {
+    const len = 1.12;
+    const ant = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.005, len, 6), mAntenna);
+    const surf = sCtr.clone().add(dir.clone().multiplyScalar(1.15));
+    ant.position.copy(surf.clone().add(dir.clone().multiplyScalar(len / 2)));
     ant.setRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir));
     ship.add(ant);
-    // Small ball tip
-    const tip = new THREE.Mesh(new THREE.SphereGeometry(0.025, 6, 6), matAntenna);
-    tip.position.copy(surfPt.clone().add(dir.clone().multiplyScalar(len)));
+    const tip = new THREE.Mesh(new THREE.SphereGeometry(0.022, 7, 7), mAntenna);
+    tip.position.copy(surf.clone().add(dir.clone().multiplyScalar(len)));
     ship.add(tip);
+  });
+  // Two comm stubs from equipment module
+  [[-0.85, 0, 0.75], [0.85, 0, 0.75]].forEach(([x, y, z]) => {
+    const dir = new THREE.Vector3(x, 0.3, z).normalize();
+    const len = 0.65;
+    const ant = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.004, len, 6), mAntenna);
+    ant.position.set(x * 0.5, 0.4 + y, z * 0.5);
+    ant.setRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir));
+    ship.add(ant);
   });
 
   vostokShip = ship;
   vostokScene.add(ship);
 
+  // Labels
   VOSTOK_LABEL_POINTS = [
-    { pos: new THREE.Vector3(0, 3.05, 0),    en: 'Descent Module',    ar: 'كبسولة الهبوط',     side: 'r' },
-    { pos: new THREE.Vector3(0, -0.58, 1.2), en: 'Instrument Module', ar: 'وحدة الأجهزة',      side: 'r' },
-    { pos: new THREE.Vector3(0, -2.4, 0.6),  en: 'TDU-1 Retrorocket', ar: 'محرك التراجع',      side: 'r' },
-    { pos: new THREE.Vector3(-1.2, 2.9, 0),  en: 'Antenna Array',     ar: 'مصفوفة الهوائيات',  side: 'l' },
-    { pos: new THREE.Vector3(1.35, 1.85, 0), en: 'Porthole Window',   ar: 'نافذة الكوة',       side: 'r' },
-    { pos: new THREE.Vector3(0, 0.68, 1),    en: 'Separation Ring',   ar: 'حلقة الفصل',        side: 'r' },
+    { pos: new THREE.Vector3(0, 3.1, 0),      en: 'Descent Module (Sharik)',  ar: 'كبسولة الهبوط (شاريك)',    side: 'r' },
+    { pos: new THREE.Vector3(0, -0.5, 1.35),  en: 'Instrument Module',        ar: 'وحدة الأجهزة',              side: 'r' },
+    { pos: new THREE.Vector3(0, -2.68, 0.8),  en: 'TDU-1 Retrorocket',        ar: 'محرك التراجع TDU-1',        side: 'r' },
+    { pos: new THREE.Vector3(-1.35, 2.85, 0), en: 'Antenna Array',            ar: 'مصفوفة الهوائيات',          side: 'l' },
+    { pos: new THREE.Vector3(1.4, 1.85, 0),   en: 'Porthole Window',          ar: 'نافذة الكوة',               side: 'r' },
+    { pos: new THREE.Vector3(0.88, 0.65, 0.9),en: 'Separation Ring',          ar: 'حلقة الفصل',                side: 'r' },
+    { pos: new THREE.Vector3(-1.25, -1.0, 0), en: 'Thermal Control Panels',   ar: 'لوحات التحكم الحراري',      side: 'l' },
   ];
 
   // ── Controls ──
-  canvas.addEventListener('mousedown', e => {
-    vostokDrag.active = true;
-    vostokDrag.prevX = e.clientX;
-    vostokDrag.prevY = e.clientY;
-    vostokAutoSpin = false;
-  });
+  canvas.addEventListener('mousedown', e => { vostokDrag.active = true; vostokDrag.prevX = e.clientX; vostokDrag.prevY = e.clientY; vostokAutoSpin = false; });
   window.addEventListener('mouseup', () => { vostokDrag.active = false; });
   window.addEventListener('mousemove', e => {
     if (!vostokDrag.active) return;
     vostokRot.y += (e.clientX - vostokDrag.prevX) * 0.007;
     vostokRot.x += (e.clientY - vostokDrag.prevY) * 0.007;
-    vostokRot.x = Math.max(-1.4, Math.min(1.4, vostokRot.x));
-    vostokDrag.prevX = e.clientX;
-    vostokDrag.prevY = e.clientY;
+    vostokRot.x = Math.max(-1.3, Math.min(1.3, vostokRot.x));
+    vostokDrag.prevX = e.clientX; vostokDrag.prevY = e.clientY;
   });
-  canvas.addEventListener('wheel', e => {
-    e.preventDefault();
-    vostokZoom = Math.max(3.5, Math.min(14, vostokZoom + e.deltaY * 0.012));
-  }, { passive: false });
+  canvas.addEventListener('wheel', e => { e.preventDefault(); vostokZoom = Math.max(3.5, Math.min(14, vostokZoom + e.deltaY * 0.012)); }, { passive: false });
   canvas.addEventListener('touchstart', e => {
     vostokAutoSpin = false;
-    if (e.touches.length === 1) {
-      vostokDrag.active = true;
-      vostokDrag.prevX = e.touches[0].clientX;
-      vostokDrag.prevY = e.touches[0].clientY;
-    } else if (e.touches.length === 2) {
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      vostokLastTouchDist = Math.sqrt(dx * dx + dy * dy);
-    }
+    if (e.touches.length === 1) { vostokDrag.active = true; vostokDrag.prevX = e.touches[0].clientX; vostokDrag.prevY = e.touches[0].clientY; }
+    else if (e.touches.length === 2) { const dx = e.touches[0].clientX - e.touches[1].clientX; const dy = e.touches[0].clientY - e.touches[1].clientY; vostokLastTouchDist = Math.sqrt(dx*dx+dy*dy); }
   }, { passive: true });
   canvas.addEventListener('touchmove', e => {
     e.preventDefault();
     if (e.touches.length === 1 && vostokDrag.active) {
       vostokRot.y += (e.touches[0].clientX - vostokDrag.prevX) * 0.007;
       vostokRot.x += (e.touches[0].clientY - vostokDrag.prevY) * 0.007;
-      vostokRot.x = Math.max(-1.4, Math.min(1.4, vostokRot.x));
-      vostokDrag.prevX = e.touches[0].clientX;
-      vostokDrag.prevY = e.touches[0].clientY;
+      vostokRot.x = Math.max(-1.3, Math.min(1.3, vostokRot.x));
+      vostokDrag.prevX = e.touches[0].clientX; vostokDrag.prevY = e.touches[0].clientY;
     } else if (e.touches.length === 2) {
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+      const dx = e.touches[0].clientX - e.touches[1].clientX; const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.sqrt(dx*dx+dy*dy);
       if (vostokLastTouchDist) vostokZoom *= vostokLastTouchDist / dist;
-      vostokZoom = Math.max(3.5, Math.min(14, vostokZoom));
-      vostokLastTouchDist = dist;
+      vostokZoom = Math.max(3.5, Math.min(14, vostokZoom)); vostokLastTouchDist = dist;
     }
   }, { passive: false });
   canvas.addEventListener('touchend', () => { vostokDrag.active = false; vostokLastTouchDist = 0; });
-
-  // Resize
   window.addEventListener('resize', () => {
     const r = wrap.getBoundingClientRect();
-    const W = r.width || 600;
-    const H = r.height || 500;
-    if (!W || !H) return;
-    vostokRenderer.setSize(W, H);
-    vostokCamera.aspect = W / H;
+    const nW = r.width || 600; const nH = r.height || 500;
+    if (!nW || !nH) return;
+    vostokRenderer.setSize(nW, nH);
+    vostokCamera.aspect = nW / nH;
     vostokCamera.updateProjectionMatrix();
   });
 
@@ -2804,15 +2869,17 @@ function initVostok() {
 
 function vostokAnimate() {
   vostokAnimId = requestAnimationFrame(vostokAnimate);
-  if (vostokAutoSpin) vostokRot.y += 0.004;
+  vostokClock += 0.016;
+  if (vostokAutoSpin) vostokRot.y += 0.0038;
   vostokShip.rotation.x = vostokRot.x;
   vostokShip.rotation.y = vostokRot.y;
   vostokCamera.position.set(0, 0, vostokZoom);
   vostokCamera.lookAt(0, 0, 0);
-
-  // Update floating labels
+  // Slowly rotate Earth
+  if (vostokEarth) vostokEarth.rotation.y += 0.0004;
+  // Subtle engine heat-glow pulse
+  if (vostokEngineGlow) vostokEngineGlow.intensity = 0.12 + Math.sin(vostokClock * 2.3) * 0.07;
   updateVostokLabels();
-
   vostokRenderer.render(vostokScene, vostokCamera);
 }
 
