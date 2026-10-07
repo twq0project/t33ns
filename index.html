@@ -1241,56 +1241,56 @@ html[lang="ar"] .v-label { direction: ltr; }
       <div class="charts-grid">
         <div class="chart-card" id="cc-bone">
           <div class="cc-header">
-            <div class="cc-title">Bone Density Loss</div>
-            <div class="cc-sub">Hip &amp; spine, % lost vs. mission day</div>
+            <div class="cc-title" id="ct-bone">Bone Density Loss</div>
+            <div class="cc-sub" id="cs-bone">Hip &amp; spine, % lost vs. mission day</div>
           </div>
           <canvas class="chart-canvas" id="chart-bone" width="500" height="200"></canvas>
-          <div class="cc-insight">Bone loss accelerates — hip bones lose ~1% density per month. Without countermeasures, a 6-month mission equals roughly a decade of normal age-related bone loss.</div>
+          <div class="cc-insight" id="ci-bone">Bone loss accelerates — hip bones lose ~1% density per month. Without countermeasures, a 6-month mission equals roughly a decade of normal age-related bone loss.</div>
         </div>
 
         <div class="chart-card" id="cc-muscle">
           <div class="cc-header">
-            <div class="cc-title">Muscle Mass Loss</div>
-            <div class="cc-sub">Leg muscles, % remaining vs. mission day</div>
+            <div class="cc-title" id="ct-muscle">Muscle Mass Loss</div>
+            <div class="cc-sub" id="cs-muscle">Leg muscles, % remaining vs. mission day</div>
           </div>
           <canvas class="chart-canvas" id="chart-muscle" width="500" height="200"></canvas>
-          <div class="cc-insight">Leg muscles begin atrophying within days of launch. Without 2+ hours of daily resistive exercise, an astronaut can lose up to 20% of lower body muscle by month 3.</div>
+          <div class="cc-insight" id="ci-muscle">Leg muscles begin atrophying within days of launch. Without 2+ hours of daily resistive exercise, an astronaut can lose up to 20% of lower body muscle by month 3.</div>
         </div>
 
         <div class="chart-card">
           <div class="cc-header">
-            <div class="cc-title">Height Change</div>
-            <div class="cc-sub">Spinal elongation in cm, vs. mission day</div>
+            <div class="cc-title" id="ct-height">Height Change</div>
+            <div class="cc-sub" id="cs-height">Spinal elongation in cm, vs. mission day</div>
           </div>
           <canvas class="chart-canvas" id="chart-height" width="500" height="200"></canvas>
-          <div class="cc-insight">Height gains peak within the first 2 weeks as spinal discs fully decompress. The 5 cm gain disappears within 10 days of returning to Earth — but the weakened spinal muscles persist for months.</div>
+          <div class="cc-insight" id="ci-height">Height gains peak within the first 2 weeks as spinal discs fully decompress. The 5 cm gain disappears within 10 days of returning to Earth — but the weakened spinal muscles persist for months.</div>
         </div>
 
         <div class="chart-card">
           <div class="cc-header">
-            <div class="cc-title">Radiation Exposure</div>
-            <div class="cc-sub">Cumulative dose in mSv (ISS orbit)</div>
+            <div class="cc-title" id="ct-radiation">Radiation Exposure</div>
+            <div class="cc-sub" id="cs-radiation">Cumulative dose in mSv (ISS orbit)</div>
           </div>
           <canvas class="chart-canvas" id="chart-radiation" width="500" height="200"></canvas>
-          <div class="cc-insight">ISS astronauts absorb ~0.5 mSv per day — about 27× the average Earth surface rate. A Mars mission would expose astronauts to 3–5× higher doses, raising lifetime cancer risk significantly.</div>
+          <div class="cc-insight" id="ci-radiation">ISS astronauts absorb ~0.5 mSv per day — about 27× the average Earth surface rate. A Mars mission would expose astronauts to 3–5× higher doses, raising lifetime cancer risk significantly.</div>
         </div>
 
         <div class="chart-card">
           <div class="cc-header">
-            <div class="cc-title">Cardiovascular Deconditioning</div>
-            <div class="cc-sub">VO2 max % of baseline vs. mission day</div>
+            <div class="cc-title" id="ct-cardio">Cardiovascular Deconditioning</div>
+            <div class="cc-sub" id="cs-cardio">VO2 max % of baseline vs. mission day</div>
           </div>
           <canvas class="chart-canvas" id="chart-cardio" width="500" height="200"></canvas>
-          <div class="cc-insight">Without exercise, aerobic capacity drops roughly 1% per day. Daily exercise protocols on the ISS limit this to about a 15% reduction — still enough to cause dizziness on return to Earth.</div>
+          <div class="cc-insight" id="ci-cardio">Without exercise, aerobic capacity drops roughly 1% per day. Daily exercise protocols on the ISS limit this to about a 15% reduction — still enough to cause dizziness on return to Earth.</div>
         </div>
 
         <div class="chart-card">
           <div class="cc-header">
-            <div class="cc-title">Intracranial Pressure</div>
-            <div class="cc-sub">Relative to Earth baseline (1.0)</div>
+            <div class="cc-title" id="ct-icp">Intracranial Pressure</div>
+            <div class="cc-sub" id="cs-icp">Relative to Earth baseline (1.0)</div>
           </div>
           <canvas class="chart-canvas" id="chart-icp" width="500" height="200"></canvas>
-          <div class="cc-insight">Fluid shifts toward the head elevate intracranial pressure chronically during long missions. This is directly linked to the visual impairment seen in ~40% of long-duration astronauts.</div>
+          <div class="cc-insight" id="ci-icp">Fluid shifts toward the head elevate intracranial pressure chronically during long missions. This is directly linked to the visual impairment seen in ~40% of long-duration astronauts.</div>
         </div>
       </div>
     </section>
@@ -2105,6 +2105,50 @@ function drawAllCharts() {
   });
 }
 
+function drawAllChartsAr() {
+  if (chartsDrawn) return;
+  chartsDrawn = true;
+  drawChart('chart-bone', {
+    yMin: 0, yMax: 12, yDec: 1,
+    series: [
+      { color: '#a0c4ff', label: 'عظمة الورك', points: makePts(d => Math.min(11, d * 0.058)) },
+      { color: '#ff9f6b', label: 'العمود الفقري', points: makePts(d => Math.min(9, d * 0.044)) },
+    ]
+  });
+  drawChart('chart-muscle', {
+    yMin: 75, yMax: 101, yDec: 0,
+    series: [
+      { color: '#4ecb8d', label: 'مع التمرين', points: makePts(d => Math.max(88, 100 - d * 0.06)) },
+      { color: '#ff6b6b', label: 'بدون تمرين', points: makePts(d => Math.max(78, 100 - d * 0.115)) },
+    ]
+  });
+  drawChart('chart-height', {
+    yMin: 0, yMax: 6, yDec: 1,
+    series: [
+      { color: '#f0a030', label: 'الزيادة في الطول (سم)', points: makePts(d => Math.min(5, d <= 3 ? d * 1.5 : 4.5 + (d - 3) * 0.004)) },
+    ]
+  });
+  drawChart('chart-radiation', {
+    yMin: 0, yMax: 100, yDec: 0,
+    series: [
+      { color: '#9f7aff', label: 'الجرعة التراكمية (ميلي سيفرت)', points: makePts(d => d * 0.5) },
+    ]
+  });
+  drawChart('chart-cardio', {
+    yMin: 74, yMax: 101, yDec: 0,
+    series: [
+      { color: '#ff6b6b', label: 'مع تمرين المحطة', points: makePts(d => Math.max(83, 100 - d * 0.09)) },
+      { color: '#f0a030', label: 'بدون تمرين', points: makePts(d => Math.max(70, 100 - d * 0.165)) },
+    ]
+  });
+  drawChart('chart-icp', {
+    yMin: 0.9, yMax: 1.5, yDec: 2,
+    series: [
+      { color: '#c06ee8', label: 'الضغط داخل الجمجمة (نسبي)', points: makePts(d => d === 0 ? 1.0 : Math.min(1.38, 1 + d * 0.0021)) },
+    ]
+  });
+}
+
 // ════════════════════════════════════════════
 // SENSATION DATA
 // ════════════════════════════════════════════
@@ -2308,7 +2352,16 @@ const AR = {
     systems: { eyebrow: 'مستكشف تفاعلي', title: 'جسم <em>الإنسان</em> في الفضاء', sub: 'انقر على أي نقطة متوهجة على الجسم لاستكشاف ما يفعله انعدام الجاذبية في ذلك الجهاز — بالتفصيل.' },
     timeline: { eyebrow: 'الجدول الزمني التفاعلي', title: 'ساعة <em>المهمة</em>', sub: 'اسحب شريط التمرير للتنقل عبر مهمة مدتها 6 أشهر. شاهد كيف يتدهور كل جهاز من أجهزة الجسم — وما هي التداعيات اليومية.' },
     gagarin: { eyebrow: '12 أبريل 1961', title: 'أول <em>إنسان</em> في الفضاء', sub: 'رواية دقيقة بدقيقة لرحلة يوري غاغارين التي استمرت 108 دقائق — أعظم رحلة في تاريخ البشرية.' },
-    charts: { eyebrow: 'بيانات بحثية', title: '<em>الرسوم</em> والبيانات', sub: 'بيانات مرئية من مهام طويلة الأمد على محطة الفضاء الدولية تُظهر كيف يتغير كل جهاز من أجهزة الجسم مع مرور الوقت.' },
+    charts: { eyebrow: 'بيانات بحثية', title: '<em>الرسوم</em> والبيانات', sub: 'بيانات مرئية من مهام طويلة الأمد على محطة الفضاء الدولية تُظهر كيف يتغير كل جهاز من أجهزة الجسم مع مرور الوقت.',
+      cards: {
+        bone:      { title: 'فقدان كثافة العظام',       sub: 'الورك والعمود الفقري، % المفقود مقابل يوم المهمة',     insight: 'يتسارع فقدان العظام — تخسر عظام الورك ~1% من كثافتها شهريًا. بدون تدابير مضادة، تعادل مهمة مدتها 6 أشهر ما يفقده الإنسان عادةً في عقد كامل من الشيخوخة.' },
+        muscle:    { title: 'فقدان كتلة العضلات',       sub: 'عضلات الساق، % المتبقي مقابل يوم المهمة',             insight: 'تبدأ عضلات الساق بالضمور في غضون أيام من الإطلاق. بدون ساعتين يوميًا من التمارين المقاومة، قد يفقد رائد الفضاء 20% من عضلات الجزء السفلي بحلول الشهر الثالث.' },
+        height:    { title: 'التغير في الطول',           sub: 'استطالة العمود الفقري بالسنتيمتر مقابل يوم المهمة',   insight: 'يبلغ الطول الزائد ذروته في الأسبوعين الأولين مع تمدد الأقراص الفقرية. تختفي الزيادة البالغة 5 سم في غضون 10 أيام من العودة إلى الأرض، لكن ضعف عضلات العمود الفقري يستمر لأشهر.' },
+        radiation: { title: 'التعرض للإشعاع',           sub: 'الجرعة التراكمية بالميلي سيفرت (مدار محطة الفضاء)',   insight: 'يمتص رواد الفضاء في محطة الفضاء الدولية ~0.5 ميلي سيفرت يوميًا — أي نحو 27 ضعف معدل سطح الأرض. رحلة إلى المريخ ستعرضهم لجرعات أعلى بـ3–5 مرات، مما يرفع خطر الإصابة بالسرطان.' },
+        cardio:    { title: 'ضعف القدرة القلبية الوعائية', sub: 'VO2 max كنسبة من خط الأساس مقابل يوم المهمة',       insight: 'بدون تمرين، تنخفض القدرة الهوائية بنحو 1% يوميًا. بروتوكولات التمرين في المحطة الدولية تحد من ذلك إلى 15% تقريبًا — لا تزال كافية لإحداث دوار عند العودة.' },
+        icp:       { title: 'الضغط داخل الجمجمة',       sub: 'نسبي مقارنةً بخط الأساس الأرضي (1.0)',              insight: 'تحول السوائل نحو الرأس يرفع الضغط داخل الجمجمة بشكل مزمن. هذا مرتبط مباشرةً بضعف البصر الذي يصيب ~40% من رواد الفضاء طويلي الأمد.' },
+      }
+    },
     sensation: { eyebrow: 'تجربة بضمير المتكلم', title: 'ماذا <em>يشعر</em> الإنسان', sub: 'التجربة الحسية والعاطفية للرحلة الفضائية — من الإطلاق إلى انعدام الجاذبية الممتد، كما وصفها رواد الفضاء.' },
     compare: { eyebrow: 'مقارنة جنبًا إلى جنب', title: 'الأرض <em>مقابل</em> الفضاء', sub: 'كل فرق فيزيولوجي رئيسي بين الحياة على الأرض ومهمة فضائية مدتها 6 أشهر.' },
     vostok:  { eyebrow: '12 أبريل 1961 · أول مركبة فضائية مأهولة', title: 'فوستوك <em>1</em>', sub: 'المركبة الفضائية التي حملت يوري غاغارين إلى المدار. اسحب للتدوير · مرّر للتكبير.' },
@@ -3259,12 +3312,10 @@ function applyLanguage(lang) {
     applyEnglish();
   }
 
-  // Rebuild all active panels
-  const activePanel = document.querySelector('.panel.active');
-  if (activePanel) {
-    const id = activePanel.id.replace('panel-', '');
+  // Rebuild ALL panels so every panel is translated, not just the active one
+  ['systems','timeline','gagarin','charts','sensation','compare','vostok'].forEach(id => {
     rebuildPanel(id, lang);
-  }
+  });
 
   // Rebuild mobile nav
   document.querySelectorAll('.navlink').forEach(l => {
@@ -3362,6 +3413,27 @@ function rebuildPanel(id, lang) {
   if (id === 'gagarin') {
     document.getElementById('gg-story')._built = false;
     buildGagarin(lang);
+  }
+
+  if (id === 'charts') {
+    const ar = lang === 'ar';
+    const set = (elId, txt) => { const el = document.getElementById(elId); if (el) el.textContent = txt; };
+    const cards = ar ? AR.panels.charts.cards : null;
+    const EN_CARDS = {
+      bone:      { title: 'Bone Density Loss',                sub: 'Hip & spine, % lost vs. mission day',             insight: 'Bone loss accelerates — hip bones lose ~1% density per month. Without countermeasures, a 6-month mission equals roughly a decade of normal age-related bone loss.' },
+      muscle:    { title: 'Muscle Mass Loss',                 sub: 'Leg muscles, % remaining vs. mission day',         insight: 'Leg muscles begin atrophying within days of launch. Without 2+ hours of daily resistive exercise, an astronaut can lose up to 20% of lower body muscle by month 3.' },
+      height:    { title: 'Height Change',                    sub: 'Spinal elongation in cm, vs. mission day',         insight: 'Height gains peak within the first 2 weeks as spinal discs fully decompress. The 5 cm gain disappears within 10 days of returning to Earth — but the weakened spinal muscles persist for months.' },
+      radiation: { title: 'Radiation Exposure',               sub: 'Cumulative dose in mSv (ISS orbit)',               insight: 'ISS astronauts absorb ~0.5 mSv per day — about 27× the average Earth surface rate. A Mars mission would expose astronauts to 3–5× higher doses, raising lifetime cancer risk significantly.' },
+      cardio:    { title: 'Cardiovascular Deconditioning',    sub: 'VO2 max % of baseline vs. mission day',            insight: 'Without exercise, aerobic capacity drops roughly 1% per day. Daily exercise protocols on the ISS limit this to about a 15% reduction — still enough to cause dizziness on return to Earth.' },
+      icp:       { title: 'Intracranial Pressure',            sub: 'Relative to Earth baseline (1.0)',                 insight: 'Fluid shifts toward the head elevate intracranial pressure chronically during long missions. This is directly linked to the visual impairment seen in ~40% of long-duration astronauts.' },
+    };
+    Object.keys(EN_CARDS).forEach(k => {
+      const d = ar ? cards[k] : EN_CARDS[k];
+      set(`ct-${k}`, d.title); set(`cs-${k}`, d.sub); set(`ci-${k}`, d.insight);
+    });
+    // Redraw charts with translated series labels
+    chartsDrawn = false;
+    if (ar) { drawAllChartsAr(); } else { drawAllCharts(); }
   }
 
   if (id === 'vostok') {
