@@ -740,6 +740,138 @@ html[lang="ar"] .ph-title { font-size: clamp(1.8rem, 3.5vw, 3rem); }
   width: 24px; height: 24px; border-radius: 6px;
   object-fit: cover; vertical-align: middle;
 }
+
+/* ════════════════════════════════════════════
+   VOSTOK 1 — 3D Model Panel
+════════════════════════════════════════════ */
+.vostok-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 1.5rem;
+  height: calc(100vh - 200px);
+  min-height: 420px;
+}
+.vostok-canvas-wrap {
+  position: relative;
+  background: radial-gradient(ellipse at 40% 40%, #0a1428 0%, #020408 70%);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+#vostok-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+  outline: none;
+}
+#vostok-canvas:active { cursor: grabbing; }
+.vostok-hint {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(6px);
+  color: var(--mid);
+  font-size: .72rem;
+  padding: .28rem .9rem;
+  border-radius: 99px;
+  pointer-events: none;
+  letter-spacing: .07em;
+  border: 1px solid rgba(255,255,255,.06);
+  white-space: nowrap;
+}
+.vostok-labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.v-label {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .68rem;
+  color: var(--fg);
+  letter-spacing: .04em;
+  white-space: nowrap;
+  opacity: .85;
+}
+.v-label-line {
+  width: 28px;
+  height: 1px;
+  background: var(--amber);
+  opacity: .6;
+}
+.v-label span {
+  background: rgba(6,10,20,.75);
+  padding: .15rem .45rem;
+  border-radius: 4px;
+  border: 1px solid rgba(240,160,48,.25);
+  color: var(--amber);
+  font-size: .66rem;
+}
+.vostok-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  overflow-y: auto;
+  padding-right: .25rem;
+}
+.vi-stat-block h3, .vi-parts h3 {
+  font-size: .68rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: .75rem;
+  padding-bottom: .4rem;
+  border-bottom: 1px solid var(--border);
+}
+.vi-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: .32rem 0;
+  border-bottom: 1px solid rgba(255,255,255,.04);
+  font-size: .8rem;
+  gap: .5rem;
+}
+.vi-stat span { color: var(--mid); flex-shrink: 0; }
+.vi-stat strong { color: var(--fg); text-align: right; }
+.vi-part {
+  display: flex;
+  gap: .75rem;
+  margin-bottom: .85rem;
+}
+.vi-part-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: .28rem;
+}
+.vi-part strong { font-size: .8rem; color: var(--fg); display: block; margin-bottom: .18rem; }
+.vi-part p { font-size: .74rem; color: var(--mid); line-height: 1.55; margin: 0; }
+.vi-fact {
+  display: flex;
+  gap: .75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--amber);
+  border-radius: 8px;
+  padding: .85rem;
+}
+.vi-fact-icon { font-size: 1.1rem; flex-shrink: 0; }
+.vi-fact p { font-size: .76rem; color: var(--mid); line-height: 1.55; margin: 0; }
+.vi-fact strong { color: var(--fg); }
+
+@media (max-width: 860px) {
+  .vostok-layout { grid-template-columns: 1fr; height: auto; }
+  .vostok-canvas-wrap { height: 55vw; min-height: 300px; }
+}
+html[lang="ar"] .vostok-layout { grid-template-columns: 300px 1fr; }
+html[lang="ar"] .vostok-hint { letter-spacing: .02em; }
 </style>
 </head>
 <body>
@@ -770,6 +902,9 @@ html[lang="ar"] .ph-title { font-size: clamp(1.8rem, 3.5vw, 3rem); }
       </button>
       <button class="navlink" data-panel="compare">
         <span class="nl-icon">⊞</span><span>Earth vs Space</span>
+      </button>
+      <button class="navlink" data-panel="vostok">
+        <span class="nl-icon">🚀</span><span>Vostok 1</span>
       </button>
     </div>
     <div class="sidenav-footer">
@@ -1166,9 +1301,1880 @@ html[lang="ar"] .ph-title { font-size: clamp(1.8rem, 3.5vw, 3rem); }
       </div>
     </section>
 
+    <!-- ════════════════════════════════
+         PANEL: VOSTOK 1 – 3D MODEL
+    ════════════════════════════════ -->
+    <section class="panel" id="panel-vostok">
+      <div class="panel-header">
+        <div class="ph-eyebrow">April 12, 1961 · First Crewed Spacecraft</div>
+        <h1 class="ph-title">Vostok <em>1</em></h1>
+        <p class="ph-sub">The spacecraft that carried Yuri Gagarin into orbit. Drag to rotate · Scroll to zoom · Pinch on mobile.</p>
+      </div>
+
+      <div class="vostok-layout">
+        <div class="vostok-canvas-wrap">
+          <canvas id="vostok-canvas"></canvas>
+          <div class="vostok-hint">⟳ Drag to rotate &nbsp;·&nbsp; Scroll to zoom</div>
+          <div class="vostok-labels" id="vostok-labels"></div>
+        </div>
+        <aside class="vostok-info">
+          <div class="vi-stat-block">
+            <h3>Mission Specs</h3>
+            <div class="vi-stat"><span>Launch date</span><strong>April 12, 1961</strong></div>
+            <div class="vi-stat"><span>Total mass</span><strong>4,725 kg</strong></div>
+            <div class="vi-stat"><span>Total length</span><strong>4.4 m</strong></div>
+            <div class="vi-stat"><span>Capsule diameter</span><strong>2.43 m</strong></div>
+            <div class="vi-stat"><span>Orbit altitude</span><strong>169 – 327 km</strong></div>
+            <div class="vi-stat"><span>Orbital period</span><strong>89.1 min</strong></div>
+            <div class="vi-stat"><span>Mission duration</span><strong>108 min</strong></div>
+            <div class="vi-stat"><span>Chief designer</span><strong>Sergei Korolev</strong></div>
+          </div>
+
+          <div class="vi-parts">
+            <h3>Key Components</h3>
+            <div class="vi-part">
+              <div class="vi-part-dot" style="background:#d4c8a0"></div>
+              <div>
+                <strong>Descent Module (Sharik)</strong>
+                <p>Spherical capsule, 2.3 m diameter. Ablative heat shield protected it during reentry at 8G. Gagarin ejected and parachuted separately.</p>
+              </div>
+            </div>
+            <div class="vi-part">
+              <div class="vi-part-dot" style="background:#4a7a40"></div>
+              <div>
+                <strong>Instrument Module</strong>
+                <p>Houses fuel tanks, life support, batteries, and communication systems. Jettisoned before reentry and burns up in the atmosphere.</p>
+              </div>
+            </div>
+            <div class="vi-part">
+              <div class="vi-part-dot" style="background:#666"></div>
+              <div>
+                <strong>TDU-1 Retrorocket</strong>
+                <p>Fired for 42 seconds to slow the craft for deorbit. Produced ~1,600 kg thrust. A malfunction caused a terrifying 10-minute spin on reentry.</p>
+              </div>
+            </div>
+            <div class="vi-part">
+              <div class="vi-part-dot" style="background:#bbb"></div>
+              <div>
+                <strong>Antenna Array</strong>
+                <p>Four whip antennas for voice communication with ground control and telemetry. Allowed real-time monitoring of Gagarin's vitals.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="vi-fact">
+            <div class="vi-fact-icon">⚠️</div>
+            <p><strong>Classified secret for years:</strong> Gagarin ejected from the capsule at 7,000 m altitude and parachuted separately. The capsule couldn't safely land with a pilot inside — but this had to be kept quiet to qualify the flight under aviation records.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
   </main>
 </div>
 
-<script src="app.js"></script>
+<script>'use strict';
+
+// ════════════════════════════════════════════
+// NEBULA / STARS CANVAS
+// ════════════════════════════════════════════
+(function () {
+  const c = document.getElementById('nebula');
+  const ctx = c.getContext('2d');
+
+  function resize() { c.width = innerWidth; c.height = innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const stars = Array.from({ length: 260 }, () => ({
+    x: Math.random(), y: Math.random(),
+    r: Math.random() * 1.4 + 0.2,
+    a: Math.random(), da: (Math.random() - 0.5) * 0.003,
+    hue: Math.random() < 0.2 ? 200 + Math.random() * 40 : 220
+  }));
+
+  // Nebula blobs
+  const blobs = [
+    { x: 0.15, y: 0.3, r: 0.3, c: '74,100,200' },
+    { x: 0.8,  y: 0.7, r: 0.25, c: '100,50,160' },
+    { x: 0.5,  y: 0.1, r: 0.2, c: '30,80,140' },
+  ];
+
+  function isDark() {
+    return document.documentElement.getAttribute('data-theme') !== 'light' &&
+           !window.matchMedia('(prefers-color-scheme: light)').matches ||
+           document.documentElement.getAttribute('data-theme') === 'dark';
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    if (!isDark()) { requestAnimationFrame(draw); return; }
+
+    // Nebula blobs
+    blobs.forEach(b => {
+      const g = ctx.createRadialGradient(
+        b.x * c.width, b.y * c.height, 0,
+        b.x * c.width, b.y * c.height, b.r * Math.min(c.width, c.height)
+      );
+      g.addColorStop(0, `rgba(${b.c},.04)`);
+      g.addColorStop(1, `rgba(${b.c},0)`);
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, c.width, c.height);
+    });
+
+    // Stars
+    stars.forEach(s => {
+      s.a += s.da;
+      if (s.a < 0 || s.a > 1) s.da *= -1;
+      ctx.beginPath();
+      ctx.arc(s.x * c.width, s.y * c.height, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${s.hue},60%,90%,${s.a * 0.75})`;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ════════════════════════════════════════════
+// THEME
+// ════════════════════════════════════════════
+const themeBtn = document.getElementById('themeBtn');
+function toggleTheme() {
+  const root = document.documentElement;
+  const isDark = root.getAttribute('data-theme') !== 'light';
+  root.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  themeBtn.textContent = isDark ? '☀ Light' : '☽ Dark';
+}
+themeBtn.addEventListener('click', toggleTheme);
+
+// ════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════
+const navLinks = document.querySelectorAll('.navlink');
+const panels   = document.querySelectorAll('.panel');
+
+function showPanel(id) {
+  panels.forEach(p => p.classList.remove('active'));
+  navLinks.forEach(l => l.classList.remove('active'));
+  const p = document.getElementById('panel-' + id);
+  if (p) { p.classList.add('active'); onPanelShow(id); }
+  const l = document.querySelector(`.navlink[data-panel="${id}"]`);
+  if (l) l.classList.add('active');
+  // sync mobile nav
+  document.querySelectorAll('.mobile-nav .navlink').forEach(ml => {
+    ml.classList.toggle('active', ml.dataset.panel === id);
+  });
+  document.getElementById('mobileNav').classList.remove('open');
+}
+
+navLinks.forEach(l => l.addEventListener('click', () => showPanel(l.dataset.panel)));
+
+// Mobile hamburger + nav clone
+const hamburger = document.getElementById('hamburger');
+const mobileNav = document.getElementById('mobileNav');
+navLinks.forEach(l => {
+  const clone = l.cloneNode(true);
+  clone.addEventListener('click', () => showPanel(clone.dataset.panel));
+  mobileNav.appendChild(clone);
+});
+hamburger.addEventListener('click', () => mobileNav.classList.toggle('open'));
+
+function onPanelShow(id) {
+  if (id === 'charts') drawAllCharts();
+  if (id === 'timeline') { updateTimeline(1); }
+  if (id === 'gagarin') buildGagarin();
+  if (id === 'sensation') showSensation('launch');
+  if (id === 'compare') buildCompare();
+  if (id === 'vostok') initVostok();
+}
+
+// ════════════════════════════════════════════
+// BODY EXPLORER DATA
+// ════════════════════════════════════════════
+const SYSTEMS = {
+  brain: {
+    title: 'Brain & Senses',
+    category: 'Neurological',
+    icon: '🧠', color: '#4a9eff',
+    desc: `In microgravity, the brain receives a flood of conflicting signals. The inner ear — the vestibular system — evolved specifically to detect the pull of gravity and transmit "which way is down" to the brain. Remove gravity and it sends confused, contradictory data while the eyes report something completely different. The brain cannot reconcile these signals and responds with intense disorientation, nausea, and spatial confusion. Over 2–4 days, the brain performs a remarkable recalibration: it effectively discounts vestibular input and relies more heavily on vision for spatial orientation. After this adaptation, most astronauts describe a profound sense of mental clarity and calm — even euphoria.`,
+    bars: [
+      { name: 'Spatial disorientation (days 1-3)', val: 90, color: '#4a9eff', label: 'Severe' },
+      { name: 'Vestibular conflict', val: 85, color: '#4a9eff', label: 'High' },
+      { name: 'Brain re-calibration speed', val: 70, color: '#4ecb8d', label: '2–4 days' },
+      { name: 'Long-term cognitive impact', val: 15, color: '#4ecb8d', label: 'Mild' },
+    ],
+    pills: [
+      { color: '#4a9eff', text: 'Inner ear loses gravity reference' },
+      { color: '#ff6b6b', text: '~70% experience space motion sickness' },
+      { color: '#4ecb8d', text: 'Brain re-maps sensory input in 72 hrs' },
+      { color: '#f0a030', text: 'Euphoria follows successful adaptation' },
+      { color: '#9f7aff', text: 'Visual cortex becomes dominant' },
+    ]
+  },
+  eyes: {
+    title: 'Eyes & Vision',
+    category: 'Ophthalmic',
+    icon: '👁️', color: '#c06ee8',
+    desc: `One of the most alarming discoveries of long-duration spaceflight is that it can permanently change the shape of an astronaut's eyes. The mechanism starts with the cephalic fluid shift: when gravity no longer holds blood and cerebrospinal fluid in the lower body, they migrate toward the head. This raises intracranial pressure — the pressure inside the skull — which presses against the optic nerves and physically flattens the back of each eyeball (a condition called globe flattening). The resulting change in eye geometry shifts focal length, causing progressive near-vision impairment. About 40% of ISS long-duration astronauts return home needing glasses or an updated prescription. This is now considered one of the top medical risks for a Mars mission.`,
+    bars: [
+      { name: 'Intracranial pressure elevation', val: 65, color: '#c06ee8', label: 'Moderate' },
+      { name: 'Optic nerve swelling risk', val: 50, color: '#ff9f6b', label: 'Elevated' },
+      { name: 'Near-vision impairment rate', val: 40, color: '#ff6b6b', label: '40% of crew' },
+      { name: 'Post-mission recovery (vision)', val: 60, color: '#4ecb8d', label: 'Usually yes' },
+    ],
+    pills: [
+      { color: '#c06ee8', text: 'Eyeball physically flattens (globe flattening)' },
+      { color: '#ff6b6b', text: 'Optic disc oedema observed on MRI' },
+      { color: '#f0a030', text: 'Progressive over a 6-month mission' },
+      { color: '#4ecb8d', text: 'Vision usually improves post-mission' },
+      { color: '#4a9eff', text: 'Major concern for deep space missions' },
+    ]
+  },
+  heart: {
+    title: 'Heart & Cardiovascular',
+    category: 'Cardiovascular',
+    icon: '🫀', color: '#ff6b6b',
+    desc: `The heart is one of the most dramatic responders to microgravity. On Earth, the heart works constantly against gravity — pumping blood up to the brain against a downward pull. In space, that fight vanishes. Initially, blood floods into the upper body and the heart receives more blood than usual (higher preload). Over weeks, the heart compensates by reducing its size — the left ventricle can shrink by up to 25%. Its shape also changes, becoming more spherical. Blood volume itself decreases by 10–15% as the kidneys excrete what the body reads as excess fluid. The cardiovascular system becomes dramatically deconditioned. Returning astronauts frequently experience orthostatic intolerance — dizziness or even fainting when standing upright — because the cardiovascular system has "forgotten" how to fight gravity.`,
+    bars: [
+      { name: 'Heart mass reduction (6 months)', val: 25, color: '#ff6b6b', label: 'Up to 25%' },
+      { name: 'Blood volume decrease', val: 15, color: '#f0a030', label: '~15%' },
+      { name: 'Orthostatic intolerance on return', val: 80, color: '#ff6b6b', label: 'Very common' },
+      { name: 'Recovery with exercise', val: 70, color: '#4ecb8d', label: 'Good' },
+    ],
+    pills: [
+      { color: '#ff6b6b', text: 'Heart becomes more spherical' },
+      { color: '#f0a030', text: 'Blood volume drops ~15%' },
+      { color: '#4a9eff', text: 'Arteries lose pressure responsiveness' },
+      { color: '#4ecb8d', text: '2hrs daily exercise is the main countermeasure' },
+      { color: '#9f7aff', text: 'Risk of fainting on return to Earth' },
+    ]
+  },
+  spine: {
+    title: 'Spine & Height',
+    category: 'Musculoskeletal',
+    icon: '🦴', color: '#f0a030',
+    desc: `The spine is one of the most fascinating stories in space physiology. Every vertebra in your spine is separated by a cartilaginous disc filled with a gel-like substance. On Earth, these discs are constantly compressed by the weight of everything above them — over the course of a day, you are measurably shorter in the evening than in the morning for exactly this reason. In space, that compression disappears. The discs expand, the spine's natural S-curve straightens, and astronauts can grow 3–5 cm taller within the first 48 hours. But the muscles that stabilize the spine — which have been doing postural work every waking hour on Earth — now have nothing to do. They atrophy. Spinal support muscle mass can drop nearly 20%. When astronauts return to Earth, their compressed spine meets weakened support muscles, creating a window of significantly elevated injury risk.`,
+    bars: [
+      { name: 'Height increase in orbit', val: 100, color: '#f0a030', label: 'Up to +5 cm' },
+      { name: 'Spinal support muscle loss', val: 19, color: '#ff6b6b', label: '~19%' },
+      { name: 'Disc herniation risk (post-mission)', val: 100, color: '#ff6b6b', label: '4× higher' },
+      { name: 'Back pain in mission', val: 52, color: '#f0a030', label: 'Common' },
+    ],
+    pills: [
+      { color: '#f0a030', text: 'Most height gained in first 24 hours' },
+      { color: '#4a9eff', text: 'Height lost within 10 days of return' },
+      { color: '#ff6b6b', text: '4× disc herniation risk post-mission' },
+      { color: '#4ecb8d', text: 'Same mechanism as morning height' },
+      { color: '#9f7aff', text: 'Rehabilitation targets spinal muscles first' },
+    ]
+  },
+  fluids: {
+    title: 'Body Fluids',
+    category: 'Circulatory',
+    icon: '💧', color: '#ff9f6b',
+    desc: `Gravity is the reason your body holds about 70% of its blood and fluid in its lower half. The moment that gravity disappears, fluid redistributes freely and evenly throughout the body — and a significant amount of it ends up in the chest, neck and head. The effect is immediate and noticeable: the face puffs up like a mild allergic reaction, the sinuses fill with congestion (chronic stuffiness is one of the most universal complaints on the ISS), and the neck and chest feel uncomfortably full. The legs, meanwhile, become noticeably thinner — earning the nickname "bird legs" from astronauts. The body eventually responds by interpreting the extra fluid in the upper body as excess and commanding the kidneys to excrete more, reducing overall blood volume by ~15%. This fluid chemistry has cascading effects on intracranial pressure, kidney function, and even taste.`,
+    bars: [
+      { name: 'Cephalic fluid redistribution', val: 75, color: '#ff9f6b', label: 'Significant' },
+      { name: 'Total blood volume decrease', val: 15, color: '#f0a030', label: '~15%' },
+      { name: 'Facial puffiness (weeks 1-2)', val: 85, color: '#ff9f6b', label: 'Very high' },
+      { name: 'Intracranial pressure increase', val: 55, color: '#ff6b6b', label: 'Moderate-high' },
+    ],
+    pills: [
+      { color: '#ff9f6b', text: 'Face puffs within hours of launch' },
+      { color: '#ff6b6b', text: 'Chronic nasal congestion throughout mission' },
+      { color: '#4a9eff', text: 'Body sheds excess fluid via kidneys' },
+      { color: '#4ecb8d', text: 'Smell and taste perception changes' },
+      { color: '#9f7aff', text: 'LBNP devices being tested as countermeasure' },
+    ]
+  },
+  bones: {
+    title: 'Bone Density',
+    category: 'Skeletal',
+    icon: '🦷', color: '#a0c4ff',
+    desc: `Bone is not the static scaffold it appears to be. It is living tissue in a constant state of remodeling — specialized cells called osteoblasts build new bone matrix while osteoclasts dissolve old bone. The trigger that keeps osteoblasts active is mechanical stress: the compression and tension forces that travel through bones when you walk, stand, or carry weight. Remove those forces in microgravity and the signal for bone building fades. Osteoclast activity continues while osteoblast activity slows, and the result is a net loss of bone mineral density of roughly 1–2% per month in weight-bearing bones. A 6-month ISS mission can leave hips with bone density comparable to a decade of normal aging. The released calcium enters the bloodstream and must be excreted, raising kidney stone risk. Bone recovery after return to Earth takes 2–3 years of rehabilitation.`,
+    bars: [
+      { name: 'Bone loss per month (hip)', val: 20, color: '#ff6b6b', label: '1–2%/month' },
+      { name: 'Total loss after 6 months', val: 80, color: '#ff6b6b', label: 'Up to 10%' },
+      { name: 'Kidney stone risk increase', val: 45, color: '#f0a030', label: 'Elevated' },
+      { name: 'Recovery timeline', val: 60, color: '#4ecb8d', label: '2–3 years' },
+    ],
+    pills: [
+      { color: '#ff6b6b', text: 'Hip and spine lose most density' },
+      { color: '#f0a030', text: 'Calcium releases into bloodstream' },
+      { color: '#4a9eff', text: 'Fracture risk elevated post-mission' },
+      { color: '#4ecb8d', text: 'Resistive exercise is the best countermeasure' },
+      { color: '#9f7aff', text: 'Equivalent to ~10 yrs aging in 6 months' },
+    ]
+  },
+  muscles: {
+    title: 'Muscles',
+    category: 'Musculoskeletal',
+    icon: '💪', color: '#4ecb8d',
+    desc: `The human muscular system is brutally use-dependent. Muscles that aren't regularly loaded begin to shrink within days. In space, the postural muscles — those that spend every waking hour holding the skeleton upright and counteracting gravity — suddenly have no function. They begin atrophying almost immediately. Leg muscles are affected most severely because on Earth they carry the entire body weight with every step. Without intervention, an astronaut can lose 20% of calf muscle mass within a month. But even with the ISS's intensive exercise protocol (two hours of mandatory daily exercise), mission crews still return with measurable muscle loss, altered fiber composition (fast-twitch fibers convert to slow-twitch), and significantly reduced maximum strength. Recovery takes 3–6 months of post-mission rehabilitation.`,
+    bars: [
+      { name: 'Calf muscle mass loss (6 months)', val: 20, color: '#ff6b6b', label: 'Up to 20%' },
+      { name: 'Thigh muscle strength reduction', val: 30, color: '#ff6b6b', label: 'Up to 30%' },
+      { name: 'With daily ISS exercise', val: 40, color: '#f0a030', label: 'Still ~10%' },
+      { name: 'Recovery time', val: 50, color: '#4ecb8d', label: '3–6 months' },
+    ],
+    pills: [
+      { color: '#ff6b6b', text: 'Legs and lower back worst affected' },
+      { color: '#f0a030', text: '2+ hours of daily resistive exercise required' },
+      { color: '#4a9eff', text: 'Muscle fiber type shifts: fast → slow twitch' },
+      { color: '#4ecb8d', text: 'Countermeasure: ARED resistance machine on ISS' },
+      { color: '#9f7aff', text: 'Walking after 6-month missions is difficult' },
+    ]
+  },
+  immune: {
+    title: 'Immune System',
+    category: 'Immunological',
+    icon: '🛡️', color: '#d4c010',
+    desc: `The immune system in space faces a multi-front assault. Microgravity itself alters the behavior of immune cells: T-lymphocytes show reduced activity, natural killer cells are less effective, and inflammatory cytokine signaling becomes dysregulated. Simultaneously, the extreme stress of spaceflight, sleep disruption, confinement, circadian rhythm disruption, and isolation all chronically elevate cortisol — and cortisol suppresses immune function. The compound result is that viruses the immune system normally keeps dormant can reactivate. Research has shown that about 47% of astronauts on long-duration missions experience reactivation of latent herpes-family viruses — including the varicella-zoster virus responsible for chickenpox and shingles. Cosmic radiation beyond Earth's magnetosphere also directly damages DNA in immune cells.`,
+    bars: [
+      { name: 'Latent virus reactivation rate', val: 47, color: '#ff6b6b', label: '~47%' },
+      { name: 'T-cell function reduction', val: 60, color: '#d4c010', label: 'Moderate' },
+      { name: 'Inflammatory dysregulation', val: 55, color: '#f0a030', label: 'Elevated' },
+      { name: 'DNA damage from radiation', val: 40, color: '#ff6b6b', label: 'Significant' },
+    ],
+    pills: [
+      { color: '#d4c010', text: 'T-cell activity significantly reduced' },
+      { color: '#ff6b6b', text: '47% herpes-family virus reactivation' },
+      { color: '#f0a030', text: 'Cortisol elevation chronically suppresses immunity' },
+      { color: '#4a9eff', text: 'Radiation damages immune cell DNA directly' },
+      { color: '#9f7aff', text: 'Vaccine effectiveness may be reduced in space' },
+    ]
+  },
+  sleep: {
+    title: 'Sleep & Circadian Rhythm',
+    category: 'Chronobiological',
+    icon: '😴', color: '#9f7aff',
+    desc: `Aboard the ISS, the Sun rises and sets every 90 minutes — 16 times per day. This batters the circadian clock, the 24-hour internal rhythm that governs sleep, hormone release, body temperature, and dozens of metabolic processes. The clock is calibrated by light-dark cycles, and 16 sunrises per day gives it nothing to latch onto. Astronauts sleep in windowless sleeping pods and take melatonin, but surveys show they consistently sleep about 6 hours per night against a recommended 8.5 hours. The resulting chronic sleep deprivation compounds nearly every other physiological challenge: it elevates cortisol (worsening immune function), impairs cognitive performance, reduces exercise tolerance, and disrupts hormone cycles critical to bone and muscle repair. Sleep deprivation is, paradoxically, one of the most dangerous yet least-discussed hazards of spaceflight.`,
+    bars: [
+      { name: 'Average sleep duration (vs 8.5 hrs)', val: 70, color: '#9f7aff', label: '~6 hrs/night' },
+      { name: 'Circadian rhythm disruption', val: 80, color: '#ff6b6b', label: 'Severe' },
+      { name: 'Cognitive performance reduction', val: 20, color: '#f0a030', label: 'Moderate' },
+      { name: 'Sleeping pill use rate', val: 75, color: '#9f7aff', label: '~75% of crew' },
+    ],
+    pills: [
+      { color: '#9f7aff', text: '16 sunrises per day on the ISS' },
+      { color: '#ff6b6b', text: 'Chronic 2+ hour sleep deficit each night' },
+      { color: '#f0a030', text: '~75% of ISS astronauts use sleep medication' },
+      { color: '#4a9eff', text: 'Melatonin and light therapy used as fixes' },
+      { color: '#4ecb8d', text: 'Sleep quality improves after first weeks' },
+    ]
+  }
+};
+
+// ── Render selected system ──────────────────
+function renderSystem(id) {
+  const data = SYSTEMS[id];
+  if (!data) return;
+
+  const content = document.getElementById('sys-content');
+  const empty   = document.getElementById('sys-empty');
+  empty.style.display = 'none';
+  content.style.display = 'block';
+
+  content.innerHTML = `
+    <div class="sc-hero">
+      <div class="sc-top">
+        <div class="sc-icon-wrap" style="background:${data.color}20">${data.icon}</div>
+        <div class="sc-title-area">
+          <div class="sc-title">${data.title}</div>
+          <span class="sc-badge" style="background:${data.color}1a;color:${data.color}">${data.category}</span>
+        </div>
+      </div>
+      <p class="sc-desc">${data.desc}</p>
+    </div>
+    <div class="sc-body">
+      <div class="sc-bars">
+        ${data.bars.map(b => `
+          <div class="sb-item">
+            <div class="sb-row">
+              <span class="sb-name">${b.name}</span>
+              <span class="sb-val">${b.label}</span>
+            </div>
+            <div class="sb-row">
+              <div class="sb-track"><div class="sb-fill" data-width="${b.val}" style="background:${b.color}"></div></div>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div class="sc-pills">
+        ${data.pills.map(p => `
+          <div class="sc-pill">
+            <div class="dot" style="background:${p.color}"></div>
+            ${p.text}
+          </div>`).join('')}
+      </div>
+    </div>`;
+
+  // Animate bars
+  requestAnimationFrame(() => {
+    content.querySelectorAll('.sb-fill').forEach(el => {
+      el.style.width = el.dataset.width + '%';
+    });
+  });
+}
+
+// Wire hotspots
+document.querySelectorAll('.hs').forEach(hs => {
+  hs.addEventListener('click', () => {
+    document.querySelectorAll('.hs').forEach(h => h.classList.remove('active'));
+    hs.classList.add('active');
+    renderSystem(hs.dataset.id);
+    // Pulse the figure
+    document.getElementById('env-badge').classList.add('space');
+    document.getElementById('env-badge').textContent = '🚀 In Space';
+  });
+  hs.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); hs.click(); }
+  });
+});
+
+// ════════════════════════════════════════════
+// MISSION CLOCK
+// ════════════════════════════════════════════
+const METRICS = [
+  {
+    id: 'height', icon: '📏', name: 'Height Change', unit: 'cm gained',
+    calc: d => Math.min(5, d <= 3 ? d * 1.5 : 4.5 + (d - 3) * 0.004),
+    severity: v => v < 1 ? 'ok' : v < 3 ? 'warn' : 'warn',
+    statusLabel: v => v < 1 ? 'Minimal' : v < 3 ? 'Growing' : 'Max stretch',
+    bar: v => v / 5 * 100, barColor: '#f0a030', decimals: 1
+  },
+  {
+    id: 'bones', icon: '🦴', name: 'Bone Density', unit: '% lost',
+    calc: d => Math.min(11, d * 0.058),
+    severity: v => v < 2 ? 'ok' : v < 5 ? 'warn' : 'danger',
+    statusLabel: v => v < 2 ? 'Normal' : v < 5 ? 'Losing' : 'Critical',
+    bar: v => v / 11 * 100, barColor: '#a0c4ff', decimals: 1
+  },
+  {
+    id: 'muscle', icon: '💪', name: 'Muscle Mass', unit: '% lost (legs)',
+    calc: d => Math.min(20, d * 0.105),
+    severity: v => v < 3 ? 'ok' : v < 10 ? 'warn' : 'danger',
+    statusLabel: v => v < 3 ? 'Normal' : v < 10 ? 'Atrophying' : 'Severe',
+    bar: v => v / 20 * 100, barColor: '#4ecb8d', decimals: 1
+  },
+  {
+    id: 'fluids', icon: '💧', name: 'Head Fluid', unit: 'relative shift',
+    calc: d => d <= 5 ? d * 18 : Math.max(38, 90 - d * 0.29),
+    severity: v => v < 20 ? 'ok' : v < 55 ? 'warn' : 'danger',
+    statusLabel: v => v < 20 ? 'Normal' : v < 55 ? 'Shifted' : 'Puffy face',
+    bar: v => Math.min(v, 100), barColor: '#ff9f6b', decimals: 0
+  },
+  {
+    id: 'cardio', icon: '🫀', name: 'Heart Fitness', unit: '% of baseline VO2',
+    calc: d => Math.max(75, 100 - d * 0.13),
+    severity: v => v > 92 ? 'ok' : v > 83 ? 'warn' : 'danger',
+    statusLabel: v => v > 92 ? 'Normal' : v > 83 ? 'Declining' : 'Reduced',
+    bar: v => (v - 75) / 25 * 100, barColor: '#ff6b6b', decimals: 0
+  },
+  {
+    id: 'immune', icon: '🛡️', name: 'Immune Function', unit: '% disruption',
+    calc: d => Math.min(55, d * 0.29),
+    severity: v => v < 10 ? 'ok' : v < 28 ? 'warn' : 'danger',
+    statusLabel: v => v < 10 ? 'Normal' : v < 28 ? 'Stressed' : 'Dysregulated',
+    bar: v => v / 55 * 100, barColor: '#d4c010', decimals: 0
+  },
+];
+
+const PHASES = [
+  { from: 1,   to: 2,   name: 'Launch day', text: `The rocket fires and G-forces crush you into the seat. Then: cutoff, silence, and every unsecured object floats. The body has entered a completely alien environment. Fluid is already beginning to migrate toward the head. The stomach protests loudly.` },
+  { from: 3,   to: 7,   name: 'Early adaptation', text: `Space motion sickness peaks around day 2-3 and begins to ease. The brain is re-mapping its spatial model, discarding vestibular cues in favor of visual ones. Most astronauts feel noticeably better by day 4. Height gain is nearly at maximum — the spine has fully decompressed. The face is visibly puffy.` },
+  { from: 8,   to: 20,  name: 'First two weeks', text: `The body has largely adapted to the weightless environment. The nausea is gone and astronauts describe feeling light, fast, and capable. Bone loss and muscle atrophy are underway but not yet severe. Daily exercise begins in earnest. Sleep is poor — the 16-sunrise cycle disrupts the circadian clock constantly.` },
+  { from: 21,  to: 59,  name: 'First month', text: `Bone density is measurably declining. Leg muscles are noticeably weaker despite two hours of daily exercise. Blood volume has stabilized at its new, lower level. The cardiovascular system has deconditioned significantly. Astronauts are performing complex science experiments and spacewalks — the body has adapted, but at a physiological cost that is accumulating.` },
+  { from: 60,  to: 89,  name: 'Month two', text: `Bone density continues to decline. Vision may be subtly changing as intracranial pressure sustains itself at an elevated level. Immune function is disrupted; latent viruses are stirring. The body is running a kind of physiological debt that will need to be repaid through months of post-mission rehabilitation.` },
+  { from: 90,  to: 149, name: 'Months three–five', text: `The mission's midpoint and beyond. The body is in a stable but compromised state. Bone and muscle losses are significant. The spinal muscles that supported the elongated spine have atrophied considerably — creating the scenario where return to gravity will be genuinely risky. Astronauts adapt psychologically to confinement and isolation; mental resilience becomes a key asset.` },
+  { from: 150, to: 180, name: 'Month six — return approach', text: `As return to Earth approaches, pre-return exercise intensifies. Astronauts are counseled about what to expect: the crushing, unfamiliar sensation of gravity. Standing up will feel impossibly heavy. Walking will be uncertain and exhausting. Every physiological change accumulated over 180 days will suddenly have to contend with 9.8 m/s² again — all at once.` },
+];
+
+function getPhase(day) {
+  return PHASES.find(p => day >= p.from && day <= p.to) || PHASES[PHASES.length - 1];
+}
+
+function buildMetricGrid(day) {
+  const grid = document.getElementById('metric-grid');
+  if (!grid._built) {
+    grid.innerHTML = METRICS.map(m => `
+      <div class="metric-card" id="mc-${m.id}">
+        <div class="mc-top">
+          <span class="mc-icon">${m.icon}</span>
+          <span class="mc-name">${m.name}</span>
+          <span class="mc-status" id="mcs-${m.id}"></span>
+        </div>
+        <div class="mc-val" id="mcv-${m.id}">—</div>
+        <div class="mc-unit">${m.unit}</div>
+        <div class="mc-bar"><div class="mc-bar-fill" id="mcb-${m.id}"></div></div>
+      </div>`).join('');
+    grid._built = true;
+  }
+  METRICS.forEach(m => {
+    const val = m.calc(day);
+    const sev = m.severity(val);
+    document.getElementById('mc-' + m.id).className = 'metric-card ' + sev;
+    document.getElementById('mcs-' + m.id).textContent = m.statusLabel(val);
+    document.getElementById('mcv-' + m.id).textContent =
+      m.decimals > 0 ? val.toFixed(m.decimals) : Math.round(val);
+    const fill = document.getElementById('mcb-' + m.id);
+    fill.style.width = Math.min(m.bar(val), 100).toFixed(1) + '%';
+    fill.style.background = sev === 'danger' ? '#ff6b6b' : sev === 'warn' ? m.barColor : '#4ecb8d';
+  });
+}
+
+function updateTimeline(val) {
+  const d = parseInt(val);
+  document.getElementById('clock-day').textContent = 'Day ' + d;
+  const phase = getPhase(d);
+  document.getElementById('clock-phase').textContent = phase.name;
+  document.getElementById('clock-narrative').textContent = phase.text;
+  buildMetricGrid(d);
+}
+
+document.getElementById('mission-slider').addEventListener('input', function () {
+  updateTimeline(this.value);
+});
+
+window.jumpDay = function (d) {
+  const sl = document.getElementById('mission-slider');
+  sl.value = d;
+  updateTimeline(d);
+};
+
+// ════════════════════════════════════════════
+// GAGARIN STORY
+// ════════════════════════════════════════════
+const STEPS = [
+  {
+    time: 'Pre-launch · 5:00 AM',
+    title: 'Final preparations',
+    text: `Gagarin wakes at 5 AM. Engineers help him into the SK-1 pressure suit — bright orange, so he can be found quickly if the landing is off-target. At the launch pad, he rides an elevator to the top of the R-7 rocket. Before climbing in, he stops and urinates on the bus tire — a tradition that Russian cosmonauts still observe before every launch. He is 27 years old. He climbs into the spherical 2.3-meter Vostok capsule and the hatch is sealed.`
+  },
+  {
+    time: '09:07 Moscow time — Launch',
+    title: 'Ignition',
+    text: `The R-7 rocket\'s engines ignite with a shudder the entire structure absorbs. Gagarin broadcasts into his radio: <em>"Poyekhali!"</em> — "Let\'s go!" The rocket lifts off. G-forces build rapidly as the vehicle accelerates through the lower atmosphere. His pulse climbs. The noise is enormous. He keeps his breathing and voice steady, reporting to ground control every 60 seconds.`
+  },
+  {
+    time: '+9 min 7 sec — Orbit',
+    title: 'The first human in space',
+    text: `The third stage separates. The engines cut off. Everything that was vibrating and pressing and roaring goes completely, impossibly silent. Gagarin\'s body lifts off the seat. His notebook, pencil, and anything not secured floats in front of his face. He experiences the sensation no human has ever felt: genuine weightlessness, sustained, in orbit around Earth. His first description: <em>"The feeling of weightlessness was somewhat unfamiliar... you feel as if you are suspended."</em>`
+  },
+  {
+    time: '+46 min — Over the Pacific',
+    title: 'Seeing Earth for the first time',
+    text: `Through the small Vzor porthole, Gagarin watches the curve of Earth scrolling beneath him. The atmosphere appears as a thin blue film clinging to the surface. He can see the terminator line between day and night. He makes his famous transmission: <em>"The Earth is blue. How wonderful. It is amazing."</em> He can see weather systems, the blue of the oceans, and the faint haze at the horizon where the planet meets space.`
+  },
+  {
+    time: '+60 min — Re-entry sequence',
+    title: 'The retrorocket fires',
+    text: `The retrorocket fires on schedule, slowing the capsule enough to drop out of orbit. But a malfunction means the service module fails to separate cleanly from the descent capsule — it remains attached by cables, causing the vehicle to spin wildly for 10 terrifying minutes as it enters the upper atmosphere. Gagarin does not report this aloud. The cables eventually burn through and separation occurs.`
+  },
+  {
+    time: '+98 min — Re-entry fireball',
+    title: '"I\'m burning. Goodbye, comrades."',
+    text: `As the capsule dips into the atmosphere, friction heats the ablative shield to over 5,000°C. A plasma sheath forms around the capsule, cutting radio contact entirely. Through the porthole, Gagarin sees flames. He does not know this is normal atmospheric re-entry. He genuinely believes he is burning to death. He transmits: <em>"I\'m burning. Goodbye, comrades."</em> Ground control hears nothing but static. He is, in fact, fine.`
+  },
+  {
+    time: '+108 min — Landing',
+    title: 'Back on Earth',
+    text: `At 7,000 meters, the hatch blows and Gagarin ejects, parachuting separately from the capsule as designed. He lands in a field near the Volga River in the Saratov region of Russia. A woman named Anna Takhtarova and her six-year-old granddaughter are the first humans he sees. He asks if they have a phone — he needs to call Moscow. Within hours, he is the most famous human being alive. The first spaceflight has lasted exactly 108 minutes.`
+  }
+];
+
+function buildGagarin() {
+  const container = document.getElementById('gg-story');
+  if (container._built) return;
+  container._built = true;
+
+  container.innerHTML = STEPS.map((s, i) => `
+    <div class="gg-step ${i === 0 ? 'active' : ''}" onclick="activateStep(this)">
+      <div class="ggs-marker">
+        <div class="ggs-dot"></div>
+        ${i < STEPS.length - 1 ? '<div class="ggs-line"></div>' : ''}
+      </div>
+      <div class="ggs-body">
+        <div class="ggs-time">${s.time}</div>
+        <div class="ggs-title">${s.title}</div>
+        <div class="ggs-text">${s.text}</div>
+      </div>
+    </div>`).join('');
+}
+
+window.activateStep = function (el) {
+  document.querySelectorAll('.gg-step').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+};
+
+// ════════════════════════════════════════════
+// CHARTS
+// ════════════════════════════════════════════
+let chartsDrawn = false;
+
+function drawChart(canvasId, data) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.clientWidth || 500;
+  const H = canvas.clientHeight || 200;
+  canvas.width = W * devicePixelRatio;
+  canvas.height = H * devicePixelRatio;
+  ctx.scale(devicePixelRatio, devicePixelRatio);
+
+  const PAD = { top: 20, right: 20, bottom: 35, left: 44 };
+  const w = W - PAD.left - PAD.right;
+  const h = H - PAD.top - PAD.bottom;
+
+  const fg     = getComputedStyle(document.documentElement).getPropertyValue('--fg').trim() || '#e8eaf2';
+  const mid    = getComputedStyle(document.documentElement).getPropertyValue('--mid').trim() || '#8890a8';
+  const surface = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim() || '#111827';
+  const amber  = getComputedStyle(document.documentElement).getPropertyValue('--amber').trim() || '#f0a030';
+
+  ctx.clearRect(0, 0, W, H);
+
+  // Grid
+  ctx.strokeStyle = surface;
+  ctx.lineWidth = 1;
+  const yTicks = 4;
+  for (let i = 0; i <= yTicks; i++) {
+    const y = PAD.top + (h / yTicks) * i;
+    ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + w, y); ctx.stroke();
+    const val = data.yMax - (data.yMax - data.yMin) / yTicks * i;
+    ctx.fillStyle = mid;
+    ctx.font = `${10 * devicePixelRatio / devicePixelRatio}px Inter, system-ui`;
+    ctx.textAlign = 'right';
+    ctx.fillText(data.formatY ? data.formatY(val) : val.toFixed(data.yDec || 0), PAD.left - 6, y + 4);
+  }
+
+  // X axis labels
+  ctx.fillStyle = mid;
+  ctx.textAlign = 'center';
+  const xLabels = [0, 30, 60, 90, 120, 150, 180];
+  xLabels.forEach(day => {
+    const x = PAD.left + (day / 180) * w;
+    ctx.fillText('D' + day, x, H - PAD.bottom + 16);
+  });
+
+  // Lines
+  data.series.forEach(series => {
+    const pts = series.points;
+    ctx.beginPath();
+    pts.forEach((p, i) => {
+      const x = PAD.left + (p.x / 180) * w;
+      const y = PAD.top + h - ((p.y - data.yMin) / (data.yMax - data.yMin)) * h;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = series.color;
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // Gradient fill
+    const last = pts[pts.length - 1];
+    const firstPt = pts[0];
+    const grad = ctx.createLinearGradient(0, PAD.top, 0, PAD.top + h);
+    grad.addColorStop(0, series.color + '30');
+    grad.addColorStop(1, series.color + '00');
+    ctx.beginPath();
+    pts.forEach((p, i) => {
+      const x = PAD.left + (p.x / 180) * w;
+      const y = PAD.top + h - ((p.y - data.yMin) / (data.yMax - data.yMin)) * h;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.lineTo(PAD.left + (last.x / 180) * w, PAD.top + h);
+    ctx.lineTo(PAD.left + (firstPt.x / 180) * w, PAD.top + h);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // End dot
+    const endX = PAD.left + (last.x / 180) * w;
+    const endY = PAD.top + h - ((last.y - data.yMin) / (data.yMax - data.yMin)) * h;
+    ctx.beginPath();
+    ctx.arc(endX, endY, 5, 0, Math.PI * 2);
+    ctx.fillStyle = series.color;
+    ctx.fill();
+  });
+
+  // Legend
+  if (data.series.length > 1) {
+    let lx = PAD.left + 8;
+    data.series.forEach(s => {
+      ctx.fillStyle = s.color;
+      ctx.fillRect(lx, PAD.top + 4, 12, 3);
+      ctx.fillStyle = mid;
+      ctx.textAlign = 'left';
+      ctx.fillText(s.label || '', lx + 16, PAD.top + 10);
+      lx += ctx.measureText(s.label || '').width + 40;
+    });
+  }
+}
+
+function makePts(fn, steps = 181) {
+  return Array.from({ length: steps }, (_, i) => ({ x: i, y: fn(i) }));
+}
+
+function drawAllCharts() {
+  if (chartsDrawn) return;
+  chartsDrawn = true;
+
+  // Bone density loss
+  drawChart('chart-bone', {
+    yMin: 0, yMax: 12, yDec: 1,
+    series: [
+      { color: '#a0c4ff', label: 'Hip bone', points: makePts(d => Math.min(11, d * 0.058)) },
+      { color: '#ff9f6b', label: 'Spine', points: makePts(d => Math.min(9, d * 0.044)) },
+    ]
+  });
+
+  // Muscle mass remaining
+  drawChart('chart-muscle', {
+    yMin: 75, yMax: 101, yDec: 0,
+    series: [
+      { color: '#4ecb8d', label: 'With exercise', points: makePts(d => Math.max(88, 100 - d * 0.06)) },
+      { color: '#ff6b6b', label: 'Without exercise', points: makePts(d => Math.max(78, 100 - d * 0.115)) },
+    ]
+  });
+
+  // Height change
+  drawChart('chart-height', {
+    yMin: 0, yMax: 6, yDec: 1,
+    series: [
+      { color: '#f0a030', label: 'Height gain (cm)', points: makePts(d => Math.min(5, d <= 3 ? d * 1.5 : 4.5 + (d - 3) * 0.004)) },
+    ]
+  });
+
+  // Radiation
+  drawChart('chart-radiation', {
+    yMin: 0, yMax: 100, yDec: 0,
+    series: [
+      { color: '#9f7aff', label: 'Cumulative dose (mSv)', points: makePts(d => d * 0.5) },
+    ]
+  });
+
+  // VO2 max
+  drawChart('chart-cardio', {
+    yMin: 74, yMax: 101, yDec: 0,
+    series: [
+      { color: '#ff6b6b', label: 'With ISS exercise', points: makePts(d => Math.max(83, 100 - d * 0.09)) },
+      { color: '#f0a030', label: 'No exercise', points: makePts(d => Math.max(70, 100 - d * 0.165)) },
+    ]
+  });
+
+  // ICP
+  drawChart('chart-icp', {
+    yMin: 0.9, yMax: 1.5, yDec: 2,
+    series: [
+      { color: '#c06ee8', label: 'Intracranial pressure (relative)', points: makePts(d => d === 0 ? 1.0 : Math.min(1.38, 1 + d * 0.0021)) },
+    ]
+  });
+}
+
+// ════════════════════════════════════════════
+// SENSATION DATA
+// ════════════════════════════════════════════
+const SENSATIONS = {
+  launch: {
+    label: 'The Launch',
+    title: 'Fire and Thunder',
+    lead: `The ground disappears in a way you have never felt anything disappear before.`,
+    body: [
+      `The first sensation is the vibration. It begins in the seat, travels through the floor, through the structure of the rocket, through your body. Everything is shaking simultaneously. The noise is physical — not heard but felt in the sternum, the teeth, the skull.`,
+      `Then the G-forces build. At maximum dynamic pressure, about 90 seconds into flight, you are pinned to your seat by 4–5 times your own weight. Breathing is labored. Your face sags. Every kilogram of you feels like five. This is the hardest the launch profile will push, and it lasts only a few minutes before staging occurs and the force drops.`,
+      `Then: the engines cut off. Everything stops. Every vibration, every sound, every force vanishes simultaneously, and in its place — nothing. The notebooks and pens float. Your arms float. You are in space.`
+    ],
+    quotes: [
+      { text: `Let's go! It vibrated, then got quiet, then I felt an enormous force pressing down on me. But I could breathe normally.`, cite: 'Yuri Gagarin, 1961' },
+      { text: `When the main engines cut off, it felt like the vehicle stopped. You go from this incredible cacophony to pure silence in an instant.`, cite: 'Astronaut description of orbital insertion' },
+    ]
+  },
+  orbit: {
+    label: 'Entering Orbit',
+    title: 'The Silence of Space',
+    lead: `There is no boundary. No line you cross. One moment you are flying very fast inside an atmosphere; the next, you are outside of it.`,
+    body: [
+      `Orbital insertion is not a dramatic event. There is no gate, no sign, no gradual transition. The atmosphere simply thins below a detectable level while the vehicle achieves the precise forward velocity — about 7.7 km/s — at which the curvature of the Earth curves away at the same rate gravity pulls you toward it. You are falling at exactly the rate the ground falls away.`,
+      `The first thing most astronauts do is look out the window. Not at the instruments, not at their checklists — at Earth. The visual impact is described consistently across cultures, ages, and nationalities: the sense that the planet looks impossibly beautiful, impossibly fragile, and disturbingly small.`,
+      `A thin blue line separates the world from the black of space. That line is the entire atmosphere — all the air that every living thing has ever breathed, all the weather, all the blue sky you have ever seen — compressed into a film that looks, from orbit, like the glaze on a glass sphere.`
+    ],
+    quotes: [
+      { text: `The thing that surprised me most was how thin the atmosphere looks. It's just a sliver. It looks incredibly fragile.`, cite: 'ISS astronaut' },
+      { text: `You go into orbit and you look at the Earth and realize the thin blue line is all there is between life and the void.`, cite: 'Astronaut post-mission interview' },
+    ]
+  },
+  weightless: {
+    label: 'Weightlessness',
+    title: 'Floating Forever',
+    lead: `Every human being who has ever lived has felt gravity every second of their existence. In space, that stops.`,
+    body: [
+      `Weightlessness does not feel like falling. At least, not like the stomach-dropping sensation of a roller coaster or an elevator. It feels, most astronauts report, like nothing. Like a neutral state. Like the default of existence has changed. There is no sense of being pulled. No sensation of weight in the body. Your arms don't hang — they float in whatever position you leave them.`,
+      `Within hours, the body begins to notice what this means physiologically. The sinuses fill. The face puffs. There is a persistent feeling of fullness behind the eyes, a mild headache that fades over days. The lower back aches as the spine elongates — sometimes quite painfully in the first 24 hours as discs that have been compressed for a lifetime suddenly expand.`,
+      `One of the strangest effects: you cannot feel your own legs as belonging to your body in the usual way. Without weight, proprioception — the sense of where your limbs are — changes. Astronauts report having to look at their legs to confirm their position, especially when sleeping.`
+    ],
+    quotes: [
+      { text: `It feels like you're perfectly suspended in the middle of the air. You can float in any direction and it takes no effort at all to maintain any position.`, cite: 'ISS expedition member' },
+      { text: `When I close my eyes, I can't tell which way is up. There is no up. My body is completely confused.`, cite: 'First-time astronaut, mission day 1' },
+    ]
+  },
+  sick: {
+    label: 'Space Sickness',
+    title: 'When the Body Revolts',
+    lead: `About 70% of astronauts experience some form of space motion sickness. For many, it is severe.`,
+    body: [
+      `Space sickness — formally called Space Adaptation Syndrome — is caused by the conflict between what the eyes see and what the vestibular system reports. On Earth, the inner ear constantly confirms gravity's direction. In space, it sends meaningless signals while the eyes say "I see a floor, I see a ceiling" — but those are arbitrary designations in an environment where there is no physical up or down.`,
+      `The brain, receiving conflicting data it cannot reconcile, interprets the situation as poisoning — the same response it has to neurotoxins that distort sensory reality. It responds accordingly: vomiting, nausea, sweating, disorientation. For some astronauts this is mild and passes in hours. For others, it is incapacitating for two or three days.`,
+      `The practical challenge: nausea and vomiting inside a spacesuit during a spacewalk — which may be scheduled within the first days of a mission — is genuinely dangerous. Vomit can block the airway or visibility inside a closed helmet. Every astronaut is given anti-nausea medication as standard issue, and spacewalks are scheduled only after the body has had time to adapt.`
+    ],
+    quotes: [
+      { text: `I was sick for two and a half days. It was exactly like the worst motion sickness you've ever had, but constant, with no relief from lying down, because lying down doesn't do anything.`, cite: 'ISS astronaut, post-mission debrief' },
+      { text: `I kept thinking — if I have to do an EVA right now, I cannot. I physically cannot. And that was frightening.`, cite: 'Astronaut describing mission day 2' },
+    ]
+  },
+  adapt: {
+    label: 'Adaptation',
+    title: 'The Brain Rewires Itself',
+    lead: `After 3–5 days, something shifts. The disorientation lifts. The body has learned to live in space.`,
+    body: [
+      `The brain's adaptation to microgravity is one of the more remarkable demonstrations of neuroplasticity. The vestibular system continues to send confused signals, but the brain learns to discount and filter them. Visual input becomes dominant for spatial orientation. The brain constructs a new model of where things are in space — one built from sight, touch, and proprioception rather than gravity.`,
+      `The resulting state is described consistently as calm, lightness, and — frequently — euphoria. The physical ease of moving in zero gravity is a genuine pleasure once the adaptation is complete. Pushing off a wall and floating across a module, turning somersaults with no effort, drinking floating globes of water, sleeping in any orientation — astronauts describe these experiences with unmistakable joy.`,
+      `Sleep, however, remains challenging throughout. The circadian rhythm — the 24-hour internal clock — has no anchor in an environment where the sun rises and sets every 90 minutes. Melatonin supplements and carefully timed bright-light exposure help, but most ISS crew members sleep about 6 hours per night against a recommended 8.5.`
+    ],
+    quotes: [
+      { text: `After about four days, I woke up and it was just... comfortable. My body had decided this was normal. It was like the best morning of my life. I felt completely at ease.`, cite: 'ISS long-duration crew member' },
+      { text: `You stop fighting it. You stop trying to maintain an orientation. You just let yourself exist in three dimensions equally.`, cite: 'Astronaut on adaptation to weightlessness' },
+    ]
+  },
+  view: {
+    label: 'Seeing Earth',
+    title: 'The Overview Effect',
+    lead: `There is a documented psychological phenomenon that occurs to most astronauts when they see Earth from space for the first time. Scientists call it the Overview Effect.`,
+    body: [
+      `The Overview Effect is not mystical. It is cognitive. When you see Earth from 400 kilometers, the absence of national borders, the thinness of the atmosphere, the smallness of the entire world in the vastness of space — these facts, which humans have always known intellectually, become viscerally, undeniably real in a way they have never been before.`,
+      `The most common descriptions: a profound sense of the fragility of the planet; an inability to maintain concern about the divisions between nations or groups; a feeling of connection to all human life simultaneously; and an overwhelming desire to protect the thin blue line of atmosphere that sustains all of it.`,
+      `Astronauts from dozens of countries, political systems, and religions have described the same core experience. Soviet cosmonauts and American astronauts during the Cold War described it. Military officers and scientists describe it. The Overview Effect appears to be a universal human response to seeing the Earth whole, from the outside, for the first time.`
+    ],
+    quotes: [
+      { text: `You develop an instant global consciousness, a people orientation, an intense dissatisfaction with the state of the world, and a compulsion to do something about it.`, cite: 'Edgar Mitchell, Apollo 14 astronaut' },
+      { text: `You want to grab a politician by the scruff of the neck and drag them a quarter of a million miles and say, "Look at that. What's so worth fighting about?"`, cite: 'Ron Garan, ISS astronaut' },
+    ]
+  },
+  return: {
+    label: 'Coming Home',
+    title: 'Gravity Returns',
+    lead: `After months of weightlessness, landing on Earth is not a homecoming. It is a second adaptation — and it can be brutal.`,
+    body: [
+      `The re-entry capsule impacts the ground and everything that weighs nothing suddenly weighs everything. For astronauts returning from a six-month ISS mission, the physical sensation of gravity returning is described as crushing, strange, and overwhelming. The body has adapted to weightlessness so thoroughly that 1G feels like a foreign force.`,
+      `The immediate challenges: standing is difficult and may be impossible without assistance. Walking is unsteady — the vestibular system, which had discounted gravity, now receives it again and must re-recalibrate. The head, which had been held by fluid pressure, now hangs heavily on the neck. The cardiovascular system, deconditioned by months of easy pumping, struggles to maintain blood pressure while standing.`,
+      `Over the weeks and months of rehabilitation, the body re-adapts. Bone density recovers over 2–3 years. Muscle mass and strength return with targeted exercise over 3–6 months. Vision usually improves. But the spinal discs re-compress and the weakened spinal muscles must carry the spine's weight again — this window carries a fourfold elevated risk of disc herniation and remains one of the most dangerous periods in an astronaut's career.`
+    ],
+    quotes: [
+      { text: `Everything was too heavy. My arms were too heavy to lift easily. My head was too heavy. After six months of nothing weighing anything, one G felt like a punishment.`, cite: 'ISS six-month crew member, post-landing' },
+      { text: `I tried to stand up and I couldn't. Not really. I had to be lifted. And when I did stand, I could feel every kilogram of my own body individually.`, cite: 'Astronaut on post-mission adaptation' },
+    ]
+  }
+};
+
+function showSensation(id) {
+  document.querySelectorAll('.sn-btn').forEach(b => b.classList.toggle('active', b.dataset.sense === id));
+  const data = SENSATIONS[id];
+  const content = document.getElementById('sensation-content');
+  content.innerHTML = `
+    <div class="sense-card">
+      <div class="sense-hero">
+        <div class="sense-label">${data.label}</div>
+        <div class="sense-title">${data.title}</div>
+        <p class="sense-lead">${data.lead}</p>
+      </div>
+      <div class="sense-body">
+        ${data.body.map(p => `<p>${p}</p>`).join('')}
+      </div>
+      <div class="sense-quotes">
+        ${data.quotes.map(q => `
+          <div class="sense-q">${q.text}<cite>— ${q.cite}</cite></div>`).join('')}
+      </div>
+    </div>`;
+}
+
+document.querySelectorAll('.sn-btn').forEach(b => {
+  b.addEventListener('click', () => showSensation(b.dataset.sense));
+});
+
+// ════════════════════════════════════════════
+// COMPARE
+// ════════════════════════════════════════════
+const COMPARE_DATA = [
+  { icon: '📏', label: 'Height', earth: 'Normal baseline', space: '+3–5 cm (spine fully decompresses in microgravity)', tag: 'better', tagText: 'Temporarily taller' },
+  { icon: '🦴', label: 'Bone Density', earth: 'Stable with normal daily activity', space: '−1 to 2% per month in hip and spine — up to 10% total loss in 6 months', tag: 'worse', tagText: 'Significant ongoing loss' },
+  { icon: '💪', label: 'Muscle Mass', earth: 'Maintained by walking, standing, daily movement', space: 'Up to −20% in leg muscles without intensive daily exercise', tag: 'worse', tagText: 'Rapid atrophy' },
+  { icon: '🫀', label: 'Heart', earth: 'Slightly elliptical, pumping upward against gravity', space: 'Becomes more spherical; shrinks up to 25%; blood volume drops 15%', tag: 'worse', tagText: 'Structural changes' },
+  { icon: '💧', label: 'Fluid Distribution', earth: '70% of body fluids in lower half, held by gravity', space: 'Fluid redistributes to upper body and head: puffy face, stuffed nose, thinner legs', tag: 'worse', tagText: 'Constant fluid shift' },
+  { icon: '👁️', label: 'Vision (near)', earth: 'Normal, stable throughout adult life', space: 'Worsens in ~40% of long-duration astronauts due to elevated intracranial pressure', tag: 'worse', tagText: 'ICP-driven impairment' },
+  { icon: '🧠', label: 'Spatial Orientation', earth: 'Clear and constant — gravity always defines "down"', space: 'Confused for 2–4 days; brain re-maps and discounts vestibular cues', tag: 'neutral', tagText: 'Adapts over time' },
+  { icon: '😴', label: 'Sleep', earth: 'Regulated by one 24-hour light/dark cycle', space: '16 sunrises per day; chronic ~6 hr sleep vs 8.5 hr recommendation', tag: 'worse', tagText: 'Circadian disruption' },
+  { icon: '☢️', label: 'Radiation', earth: '~3 mSv per year (surface level)', space: '~80–180 mSv per year on ISS; far higher on deep space missions', tag: 'worse', tagText: '27–60× higher dose' },
+  { icon: '🛡️', label: 'Immune System', earth: 'Functioning normally; latent viruses kept dormant', space: '~47% virus reactivation rate; T-cell activity reduced; DNA damage from radiation', tag: 'worse', tagText: 'Immune dysregulation' },
+  { icon: '🦷', label: 'Back Pain Risk', earth: 'Baseline population risk', space: '4× increased herniation risk during post-mission re-adaptation to gravity', tag: 'worse', tagText: 'Post-mission danger window' },
+  { icon: '🌡️', label: 'Mood', earth: 'Baseline, subject to Earth stressors', space: 'Nausea and disorientation → then calm and euphoria after adaptation', tag: 'neutral', tagText: 'Improves after day 4' },
+  { icon: '🏃', label: 'Exercise capacity', earth: 'Baseline aerobic fitness', space: '~15% VO2 max reduction even with 2 hrs daily exercise; fatigue after return', tag: 'worse', tagText: 'Deconditioning ongoing' },
+  { icon: '👃', label: 'Taste & Smell', earth: 'Normal acuity', space: 'Dulled — fluid fills sinuses, reducing smell-driven flavor perception', tag: 'worse', tagText: 'Congestion-driven' },
+];
+
+function buildCompare() {
+  const grid = document.getElementById('compare-grid');
+  if (grid._built) return;
+  grid._built = true;
+
+  grid.innerHTML = `
+    <div class="cmp-header-row">
+      <div style="color:var(--mid)">System</div>
+      <div>🌍 On Earth</div>
+      <div>🚀 In Space (6 months)</div>
+    </div>` +
+    COMPARE_DATA.map(r => `
+      <div class="cmp-row">
+        <div class="cmp-label"><span class="clabel-icon">${r.icon}</span>${r.label}</div>
+        <div class="cmp-earth">${r.earth}</div>
+        <div class="cmp-space">
+          ${r.space}
+          <br><span class="cmp-tag tag-${r.tag}">${r.tagText}</span>
+        </div>
+      </div>`).join('');
+}
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+showPanel('systems');
+// Pre-init timeline data
+buildMetricGrid(1);
+updateTimeline(1);
+
+// ════════════════════════════════════════════
+// ARABIC TRANSLATIONS
+// ════════════════════════════════════════════
+const AR = {
+  // Nav
+  nav: {
+    logo: 'علم الفضاء الحيوي',
+    systems: 'أجهزة الجسم',
+    timeline: 'ساعة المهمة',
+    gagarin: 'أول إنسان',
+    charts: 'البيانات والرسوم',
+    sensation: 'الإحساس',
+    compare: 'الأرض مقابل الفضاء',
+    vostok: 'فوستوك 1',
+    themeLight: '☀ فاتح',
+    themeDark: '☽ داكن',
+    langSwitch: '🌐 English',
+  },
+
+  // Panel headers
+  panels: {
+    systems: { eyebrow: 'مستكشف تفاعلي', title: 'جسم <em>الإنسان</em> في الفضاء', sub: 'انقر على أي نقطة متوهجة على الجسم لاستكشاف ما يفعله انعدام الجاذبية في ذلك الجهاز — بالتفصيل.' },
+    timeline: { eyebrow: 'الجدول الزمني التفاعلي', title: 'ساعة <em>المهمة</em>', sub: 'اسحب شريط التمرير للتنقل عبر مهمة مدتها 6 أشهر. شاهد كيف يتدهور كل جهاز من أجهزة الجسم — وما هي التداعيات اليومية.' },
+    gagarin: { eyebrow: '12 أبريل 1961', title: 'أول <em>إنسان</em> في الفضاء', sub: 'رواية دقيقة بدقيقة لرحلة يوري غاغارين التي استمرت 108 دقائق — أعظم رحلة في تاريخ البشرية.' },
+    charts: { eyebrow: 'بيانات بحثية', title: '<em>الرسوم</em> والبيانات', sub: 'بيانات مرئية من مهام طويلة الأمد على محطة الفضاء الدولية تُظهر كيف يتغير كل جهاز من أجهزة الجسم مع مرور الوقت.' },
+    sensation: { eyebrow: 'تجربة بضمير المتكلم', title: 'ماذا <em>يشعر</em> الإنسان', sub: 'التجربة الحسية والعاطفية للرحلة الفضائية — من الإطلاق إلى انعدام الجاذبية الممتد، كما وصفها رواد الفضاء.' },
+    compare: { eyebrow: 'مقارنة جنبًا إلى جنب', title: 'الأرض <em>مقابل</em> الفضاء', sub: 'كل فرق فيزيولوجي رئيسي بين الحياة على الأرض ومهمة فضائية مدتها 6 أشهر.' },
+    vostok:  { eyebrow: '12 أبريل 1961 · أول مركبة فضائية مأهولة', title: 'فوستوك <em>1</em>', sub: 'المركبة الفضائية التي حملت يوري غاغارين إلى المدار. اسحب للتدوير · مرّر للتكبير.' },
+  },
+
+  // Sensation nav
+  sensationNav: {
+    launch: 'الإطلاق',
+    orbit: 'دخول المدار',
+    weightless: 'انعدام الجاذبية',
+    sick: 'دوار الفضاء',
+    adapt: 'التكيّف',
+    view: 'رؤية الأرض',
+    return: 'العودة للأرض',
+  },
+
+  // Clock
+  clock: {
+    dayPrefix: 'اليوم ',
+    rangeLabel: '0 ← 180 يومًا',
+    marks: ['ي1','أ1','ش1','ش2','ش3','ش4','ش5','ش6'],
+    phases: [
+      { name: 'يوم الإطلاق', text: 'تنطلق الصاروخ وتسحقك قوى الجاذبية في المقعد. ثم: التوقف، الصمت، وكل شيء غير مربوط يطفو. لقد دخل الجسم بيئة غريبة تمامًا. بدأت السوائل بالفعل في الانتقال نحو الرأس. المعدة تحتج بشدة.' },
+      { name: 'التكيّف المبكر', text: 'يبلغ دوار الفضاء ذروته في اليومين الثاني والثالث ثم يبدأ في التراجع. الدماغ يعيد رسم نموذجه المكاني، يتجاهل إشارات الأذن الداخلية لصالح الإشارات البصرية. معظم رواد الفضاء يشعرون بتحسن ملحوظ بحلول اليوم الرابع. الارتفاع في القامة وصل إلى حده الأقصى تقريبًا — العمود الفقري تمدد بالكامل. الوجه منتفخ بوضوح.' },
+      { name: 'الأسبوعان الأولان', text: 'تكيّف الجسم إلى حد بعيد مع بيئة انعدام الوزن. اختفى الغثيان وبدأ رواد الفضاء يصفون شعورًا بالخفة والسرعة والقدرة. فقدان العظام وضمور العضلات جاريان لكنهما ليسا حادَّين بعد. بدأ التمرين اليومي بجدية. النوم سيئ — دورة الشمس الستة عشر تعطل الساعة البيولوجية باستمرار.' },
+      { name: 'الشهر الأول', text: 'كثافة العظام تتراجع بشكل ملحوس. عضلات الساقين أضعف بشكل واضح رغم ساعتين من التمرين اليومي. استقر حجم الدم عند مستواه الجديد المنخفض. الجهاز القلبي الوعائي فقد لياقته بشكل كبير. يؤدي رواد الفضاء تجارب علمية معقدة وسيرًا في الفضاء — الجسم تكيّف، لكن بتكلفة فيزيولوجية تتراكم.' },
+      { name: 'الشهر الثاني', text: 'كثافة العظام لا تزال تتراجع. قد يتغير البصر بشكل خفي مع استمرار الضغط داخل الجمجمة عند مستوى مرتفع. وظيفة المناعة مضطربة؛ الفيروسات الكامنة في حالة تأهب. الجسم يراكم نوعًا من الديون الفيزيولوجية التي ستحتاج إلى أشهر من إعادة التأهيل بعد المهمة.' },
+      { name: 'الأشهر 3-5', text: 'منتصف المهمة وما بعده. الجسم في حالة مستقرة لكن متدهورة. خسائر العظام والعضلات كبيرة. عضلات الجذع التي كانت تدعم العمود الفقري الممتد ضمرت بشكل كبير — مما يخلق سيناريو يكون فيه العودة للجاذبية محفوفًا بمخاطر حقيقية. يتكيف رواد الفضاء نفسيًا مع العزل والانفصال.' },
+      { name: 'الشهر السادس — الاقتراب من العودة', text: 'مع اقتراب العودة إلى الأرض، يشتد التمرين التحضيري. يُنبَّه رواد الفضاء عما ينتظرهم: الإحساس الساحق الغريب بالجاذبية. الوقوف سيبدو ثقيلًا بشكل مستحيل. المشي سيكون متذبذبًا ومرهقًا. كل تغيير فيزيولوجي تراكم على مدى 180 يومًا سيواجه 9.8 م/ث² دفعة واحدة.' },
+    ],
+  },
+
+  // Metric statuses
+  metricStatus: {
+    ok: 'طبيعي', warn: 'تحذير', danger: 'خطر',
+    height: { name: 'التغيّر في الطول', unit: 'سم مكتسبة' },
+    bones:  { name: 'كثافة العظام',    unit: '٪ مفقودة' },
+    muscle: { name: 'كتلة العضلات',   unit: '٪ مفقودة (الساقان)' },
+    fluids: { name: 'سوائل الرأس',    unit: 'تحوّل نسبي' },
+    cardio: { name: 'لياقة القلب',     unit: '٪ من الخط الأساسي' },
+    immune: { name: 'المناعة',         unit: '٪ اضطراب' },
+    metricStat: {
+      height: { ok: 'ضئيل', warn: 'في الازدياد', danger: 'أقصى تمدد' },
+      bones:  { ok: 'طبيعي', warn: 'يتناقص', danger: 'حرج' },
+      muscle: { ok: 'طبيعي', warn: 'ضمور', danger: 'شديد' },
+      fluids: { ok: 'طبيعي', warn: 'متحوّل', danger: 'انتفاخ الوجه' },
+      cardio: { ok: 'طبيعي', warn: 'يتراجع', danger: 'منخفض' },
+      immune: { ok: 'طبيعي', warn: 'مجهَد', danger: 'مضطرب' },
+    }
+  },
+
+  // Systems
+  systems: {
+    brain: {
+      title: 'الدماغ والحواس', category: 'عصبي',
+      desc: `في انعدام الجاذبية، يتلقى الدماغ إشارات متضاربة. الأذن الداخلية — الجهاز الدهليزي — تطورت تحديدًا لاكتشاف الجاذبية وإرسال "أي اتجاه هو الأسفل" إلى الدماغ. أزِل الجاذبية وسترسل بيانات مربكة ومتناقضة بينما تُبلّغ العيون بشيء مختلف تمامًا. يعجز الدماغ عن التوفيق بين هذه الإشارات فيستجيب بارتباك شديد وغثيان وتشوش مكاني. بعد يومين إلى أربعة أيام، يُجري الدماغ معايرة مذهلة: يتجاهل إشارات الجهاز الدهليزي ويعتمد أكثر على الرؤية للتوجه المكاني. بعد هذا التكيّف، يصف معظم رواد الفضاء شعورًا عميقًا بالوضوح الذهني والهدوء — بل النشوة.`,
+      bars: [
+        { name: 'الارتباك المكاني (الأيام 1-3)', val: 90, color: '#4a9eff', label: 'شديد' },
+        { name: 'تعارض الجهاز الدهليزي', val: 85, color: '#4a9eff', label: 'مرتفع' },
+        { name: 'سرعة إعادة المعايرة', val: 70, color: '#4ecb8d', label: '2-4 أيام' },
+        { name: 'الأثر المعرفي بعيد المدى', val: 15, color: '#4ecb8d', label: 'خفيف' },
+      ],
+      pills: [
+        { color: '#4a9eff', text: 'الأذن الداخلية تفقد مرجعية الجاذبية' },
+        { color: '#ff6b6b', text: '~٧٠٪ يعانون من دوار الفضاء' },
+        { color: '#4ecb8d', text: 'الدماغ يعيد رسم خارطته الحسية في 72 ساعة' },
+        { color: '#f0a030', text: 'نشوة تتبع التكيّف الناجح' },
+        { color: '#9f7aff', text: 'القشرة البصرية تصبح مهيمنة' },
+      ]
+    },
+    eyes: {
+      title: 'العيون والرؤية', category: 'طب العيون',
+      desc: `من أكثر اكتشافات رحلات الفضاء الطويلة إثارة للقلق أنها قد تغيّر شكل عيني رائد الفضاء بشكل دائم. الآلية تبدأ بتحوّل السوائل نحو الرأس: عندما لا تحبس الجاذبية الدم والسائل الدماغي الشوكي في الجزء السفلي من الجسم، فإنهما يتحركان نحو الرأس، مما يرفع الضغط داخل الجمجمة ويضغط على الأعصاب البصرية ويُفلطح الجزء الخلفي من كل عين فعليًا. نحو ٤٠٪ من رواد الفضاء في المهام الطويلة على محطة الفضاء الدولية يعودون إلى المنزل بحاجة إلى نظارات أو وصفة طبية محدّثة.`,
+      bars: [
+        { name: 'ارتفاع الضغط داخل الجمجمة', val: 65, color: '#c06ee8', label: 'معتدل' },
+        { name: 'خطر تورم العصب البصري', val: 50, color: '#ff9f6b', label: 'مرتفع' },
+        { name: 'معدل ضعف الرؤية القريبة', val: 40, color: '#ff6b6b', label: '٤٠٪ من الطاقم' },
+        { name: 'التعافي بعد المهمة', val: 60, color: '#4ecb8d', label: 'في الغالب نعم' },
+      ],
+      pills: [
+        { color: '#c06ee8', text: 'مقلة العين تتسطح فعليًا' },
+        { color: '#ff6b6b', text: 'تورم القرص البصري يُلاحظ بالتصوير' },
+        { color: '#f0a030', text: 'تتطور تدريجيًا خلال مهمة 6 أشهر' },
+        { color: '#4ecb8d', text: 'تتحسن الرؤية عادةً بعد المهمة' },
+        { color: '#4a9eff', text: 'مخاوف رئيسية لمهام الفضاء العميق' },
+      ]
+    },
+    heart: {
+      title: 'القلب والجهاز الوعائي', category: 'قلبي وعائي',
+      desc: `القلب من أكثر الأعضاء استجابةً لانعدام الجاذبية. على الأرض، يعمل القلب باستمرار ضد الجاذبية — يضخ الدم إلى أعلى نحو الدماغ. في الفضاء، تختفي هذه المعركة. ينتقل الدم في البداية إلى الجزء العلوي من الجسم ويتلقى القلب دمًا أكثر من المعتاد. على مدى أسابيع، يعوّض القلب بتقليص حجمه — يمكن أن تنكمش البطين الأيسر بنسبة تصل إلى ٢٥٪. يتغير شكله أيضًا، ليصبح أكثر كروية. يعود رواد الفضاء كثيرًا يعانون من عدم تحمل الوضع الانتصابي — الدوار أو الإغماء عند الوقوف.`,
+      bars: [
+        { name: 'انخفاض كتلة القلب (6 أشهر)', val: 25, color: '#ff6b6b', label: 'حتى ٢٥٪' },
+        { name: 'انخفاض حجم الدم', val: 15, color: '#f0a030', label: '~١٥٪' },
+        { name: 'عدم تحمل الوضع الانتصابي عند العودة', val: 80, color: '#ff6b6b', label: 'شائع جدًا' },
+        { name: 'التعافي مع التمرين', val: 70, color: '#4ecb8d', label: 'جيد' },
+      ],
+      pills: [
+        { color: '#ff6b6b', text: 'القلب يصبح أكثر كروية' },
+        { color: '#f0a030', text: 'حجم الدم ينخفض ~١٥٪' },
+        { color: '#4a9eff', text: 'الشرايين تفقد استجابتها للضغط' },
+        { color: '#4ecb8d', text: '٢ ساعة تمرين يومي: الحل الرئيسي' },
+        { color: '#9f7aff', text: 'خطر الإغماء عند العودة للأرض' },
+      ]
+    },
+    spine: {
+      title: 'العمود الفقري والطول', category: 'عضلي هيكلي',
+      desc: `العمود الفقري من أكثر قصص فيزيولوجيا الفضاء إثارة للدهشة. في انعدام الجاذبية، يختفي الضغط على الأقراص الفقرية فيمتد العمود الفقري. يمكن أن يزداد طول رواد الفضاء من 3 إلى 5 سنتيمترات خلال الـ 48 ساعة الأولى. لكن العضلات التي تثبّت العمود الفقري — والتي كانت تعمل كل ساعة يقظة على الأرض — لم يعد لها ما تفعله فتضمر. يمكن أن تنخفض كتلة العضلات الداعمة للعمود الفقري بنحو ٢٠٪. عند العودة إلى الأرض، يواجه العمود الفقري المنضغط عضلاتٍ ضعيفةً، مما يخلق نافذة خطورة مرتفعة للإصابة.`,
+      bars: [
+        { name: 'زيادة الطول في المدار', val: 100, color: '#f0a030', label: 'حتى +٥ سم' },
+        { name: 'فقدان عضلات دعم العمود', val: 19, color: '#ff6b6b', label: '~١٩٪' },
+        { name: 'خطر انزلاق الغضروف بعد المهمة', val: 100, color: '#ff6b6b', label: '٤× أعلى' },
+        { name: 'آلام الظهر أثناء المهمة', val: 52, color: '#f0a030', label: 'شائع' },
+      ],
+      pills: [
+        { color: '#f0a030', text: 'معظم الطول يُكتسب في أول 24 ساعة' },
+        { color: '#4a9eff', text: 'يعود الطول للطبيعي في 10 أيام من العودة' },
+        { color: '#ff6b6b', text: 'خطر الانزلاق الغضروفي ٤ أضعاف' },
+        { color: '#4ecb8d', text: 'نفس آلية طول الصباح عند الإنسان العادي' },
+        { color: '#9f7aff', text: 'إعادة التأهيل تستهدف عضلات العمود أولًا' },
+      ]
+    },
+    fluids: {
+      title: 'سوائل الجسم', category: 'دوراني',
+      desc: `الجاذبية هي السبب في أن جسمك يحتفظ بنحو ٧٠٪ من دمه وسوائله في النصف السفلي. في اللحظة التي تختفي فيها تلك الجاذبية، تتوزع السوائل بحرية وتساوٍ في جميع أنحاء الجسم — وينتهي المطاف بكمية كبيرة منها في الصدر والرقبة والرأس. التأثير فوري وملحوظ: ينتفخ الوجه، وتتكدس الجيوب الأنفية، وتصبح الساقان أنحف بشكل لافت — مما أكسبها لقب "أرجل الطيور".`,
+      bars: [
+        { name: 'تحوّل السوائل نحو الرأس', val: 75, color: '#ff9f6b', label: 'كبير' },
+        { name: 'انخفاض حجم الدم الكلي', val: 15, color: '#f0a030', label: '~١٥٪' },
+        { name: 'انتفاخ الوجه (الأسبوعان الأولان)', val: 85, color: '#ff9f6b', label: 'مرتفع جدًا' },
+        { name: 'ارتفاع الضغط داخل الجمجمة', val: 55, color: '#ff6b6b', label: 'معتدل-مرتفع' },
+      ],
+      pills: [
+        { color: '#ff9f6b', text: 'الوجه ينتفخ في غضون ساعات من الإطلاق' },
+        { color: '#ff6b6b', text: 'احتقان أنفي مزمن طوال المهمة' },
+        { color: '#4a9eff', text: 'الجسم يتخلص من السوائل الزائدة عبر الكلى' },
+        { color: '#4ecb8d', text: 'تتغير حاستا الشم والتذوق' },
+        { color: '#9f7aff', text: 'أجهزة الضغط السفلي قيد الاختبار كحل' },
+      ]
+    },
+    bones: {
+      title: 'كثافة العظام', category: 'هيكلي',
+      desc: `العظم ليس هيكلًا ثابتًا كما يبدو. إنه نسيج حي في حالة إعادة بناء مستمرة. الخلايا البانية للعظم تبني مصفوفة عظمية جديدة بينما تذيب خلايا الارتشاف العظام القديمة. المحفّز الذي يبقي الخلايا البانية نشطةً هو الإجهاد الميكانيكي: قوى الضغط والشد التي تنتقل عبر العظام عند المشي والوقوف وحمل الأوزان. أزِل هذه القوى في انعدام الجاذبية وسيتلاشى إشارة بناء العظم. مهمة مدتها 6 أشهر قد تترك عظام الورك بكثافة تعادل عقدًا من الشيخوخة الطبيعية.`,
+      bars: [
+        { name: 'فقدان العظام شهريًا (الورك)', val: 20, color: '#ff6b6b', label: '١-٢٪/شهر' },
+        { name: 'إجمالي الفقدان بعد 6 أشهر', val: 80, color: '#ff6b6b', label: 'حتى ١٠٪' },
+        { name: 'ارتفاع خطر حصى الكلى', val: 45, color: '#f0a030', label: 'مرتفع' },
+        { name: 'مدة التعافي', val: 60, color: '#4ecb8d', label: '2-3 سنوات' },
+      ],
+      pills: [
+        { color: '#ff6b6b', text: 'الورك والعمود الفقري يفقدان أكثر' },
+        { color: '#f0a030', text: 'الكالسيوم يتسرب إلى مجرى الدم' },
+        { color: '#4a9eff', text: 'خطر الكسر مرتفع بعد المهمة' },
+        { color: '#4ecb8d', text: 'تمارين المقاومة: الحل الأفضل' },
+        { color: '#9f7aff', text: 'يعادل ~١٠ سنوات من الشيخوخة في 6 أشهر' },
+      ]
+    },
+    muscles: {
+      title: 'العضلات', category: 'عضلي هيكلي',
+      desc: `الجهاز العضلي البشري يعتمد بشكل صارم على الاستخدام. العضلات التي لا تُحمَّل بانتظام تبدأ بالضمور في غضون أيام. في الفضاء، عضلات الوضعية — تلك التي تقضي كل ساعة يقظة في دعم الهيكل العظمي ومقاومة الجاذبية — لم يعد لها وظيفة. تضمر تقريبًا فورًا. عضلات الساقين هي الأشد تضررًا لأنها تحمل وزن الجسم كله مع كل خطوة على الأرض. بدون تدخل، يمكن لرائد الفضاء أن يفقد ٢٠٪ من عضلات الساق في شهر واحد.`,
+      bars: [
+        { name: 'فقدان عضلات الساق (6 أشهر)', val: 20, color: '#ff6b6b', label: 'حتى ٢٠٪' },
+        { name: 'انخفاض قوة الفخذين', val: 30, color: '#ff6b6b', label: 'حتى ٣٠٪' },
+        { name: 'مع التمرين اليومي على محطة الفضاء', val: 40, color: '#f0a030', label: 'لا تزال ~١٠٪' },
+        { name: 'مدة التعافي', val: 50, color: '#4ecb8d', label: '3-6 أشهر' },
+      ],
+      pills: [
+        { color: '#ff6b6b', text: 'الساقان والظهر الأشد تضررًا' },
+        { color: '#f0a030', text: 'أكثر من ساعتين تمرين مقاومة يوميًا مطلوب' },
+        { color: '#4a9eff', text: 'تغيير في نوع ألياف العضلات: سريع → بطيء' },
+        { color: '#4ecb8d', text: 'جهاز ARED على محطة الفضاء الدولية: أفضل حل' },
+        { color: '#9f7aff', text: 'المشي بعد مهام 6 أشهر صعب' },
+      ]
+    },
+    immune: {
+      title: 'الجهاز المناعي', category: 'مناعي',
+      desc: `الجهاز المناعي في الفضاء يواجه هجومًا متعدد الجبهات. انعدام الجاذبية يغيّر سلوك خلايا المناعة: الخلايا اللمفاوية التائية تُظهر نشاطًا مخفضًا، والخلايا القاتلة الطبيعية أقل فاعلية. في الوقت ذاته، يرفع الإجهاد الشديد والحرمان من النوم والعزل مستويات الكورتيزول بشكل مزمن — والكورتيزول يقمع المناعة. النتيجة المركّبة: حوالي ٤٧٪ من رواد الفضاء يعانون من إعادة تنشيط فيروسات كامنة من عائلة الهيربس خلال المهام الطويلة.`,
+      bars: [
+        { name: 'معدل إعادة تنشيط الفيروسات الكامنة', val: 47, color: '#ff6b6b', label: '~٤٧٪' },
+        { name: 'انخفاض نشاط الخلايا التائية', val: 60, color: '#d4c010', label: 'معتدل' },
+        { name: 'اضطراب الاستجابة الالتهابية', val: 55, color: '#f0a030', label: 'مرتفع' },
+        { name: 'تلف الحمض النووي من الإشعاع', val: 40, color: '#ff6b6b', label: 'كبير' },
+      ],
+      pills: [
+        { color: '#d4c010', text: 'نشاط الخلايا التائية ينخفض بشكل ملحوظ' },
+        { color: '#ff6b6b', text: '٤٧٪ إعادة تنشيط فيروسات الهيربس' },
+        { color: '#f0a030', text: 'الكورتيزول المزمن يقمع المناعة' },
+        { color: '#4a9eff', text: 'الإشعاع الكوني يتلف الحمض النووي للخلايا المناعية' },
+        { color: '#9f7aff', text: 'فاعلية اللقاحات قد تقل في الفضاء' },
+      ]
+    },
+    sleep: {
+      title: 'النوم والإيقاع اليومي', category: 'بيولوجيا الزمن',
+      desc: `على متن محطة الفضاء الدولية، تشرق الشمس وتغرب كل 90 دقيقة — 16 مرة في اليوم. هذا يضرب الساعة البيولوجية، الإيقاع الداخلي الذي يحكم النوم وإطلاق الهرمونات ودرجة حرارة الجسم وعشرات العمليات الأيضية. الساعة تُعايَر بدورات الضوء والظلام، و16 شروق يوميًا لا يعطيها ما تتمسك به. يصف رواد الفضاء النوم المتقطع والإرهاق المزمن باستمرار، وحوالي ٧٥٪ منهم يتناولون أدوية للنوم طوال المهمة.`,
+      bars: [
+        { name: 'متوسط مدة النوم (مقارنة بـ ٨.٥ ساعة)', val: 70, color: '#9f7aff', label: '~٦ ساعات/ليلة' },
+        { name: 'اضطراب الإيقاع البيولوجي', val: 80, color: '#ff6b6b', label: 'شديد' },
+        { name: 'انخفاض الأداء المعرفي', val: 20, color: '#f0a030', label: 'معتدل' },
+        { name: 'معدل استخدام أدوية النوم', val: 75, color: '#9f7aff', label: '~٧٥٪ من الطاقم' },
+      ],
+      pills: [
+        { color: '#9f7aff', text: '١٦ شروقًا في اليوم على محطة الفضاء' },
+        { color: '#ff6b6b', text: 'عجز نوم مزمن بأكثر من ساعتين كل ليلة' },
+        { color: '#f0a030', text: '~٧٥٪ من رواد الفضاء يتناولون دواء للنوم' },
+        { color: '#4a9eff', text: 'الميلاتونين والعلاج الضوئي كحلول' },
+        { color: '#4ecb8d', text: 'جودة النوم تتحسن بعد الأسابيع الأولى' },
+      ]
+    },
+  },
+
+  // Gagarin steps
+  gagarin: {
+    title: 'أول <em>إنسان</em> في الفضاء',
+    eyebrow: '12 أبريل 1961',
+    sub: 'رواية دقيقة بدقيقة لرحلة يوري غاغارين التي استمرت 108 دقائق — أعظم رحلة في تاريخ البشرية.',
+    dossier: {
+      title: 'بيانات المهمة · فوستوك 1',
+      name: 'يوري أليكسيفيتش غاغارين',
+      role: 'طيار القوات الجوية السوفيتية · رائد فضاء',
+      fields: [
+        ['العمر', '27 عامًا'],
+        ['المركبة', 'فوستوك 1'],
+        ['المدة', '108 دقائق'],
+        ['عدد المدارات', '1'],
+        ['الارتفاع الأقصى', '327 كم'],
+        ['السرعة', '27,400 كم/س'],
+        ['معدل نبضات القلب', '64 نبضة/دقيقة (هادئ)'],
+        ['مكان الهبوط', 'ساراتوف، روسيا'],
+      ],
+      quote: '"الأرض زرقاء. يا له من شيء رائع. إنه مذهل."',
+      quoteCite: '— في المدار، 12 أبريل 1961',
+    },
+    bodyDataTitle: 'بيانات الجسم أثناء الرحلة',
+    bodyData: [
+      ['معدل النبض عند الإطلاق', '~100 نبضة/دقيقة'],
+      ['معدل النبض في المدار', '64 نبضة/دقيقة'],
+      ['معدل التنفس', 'طبيعي'],
+      ['الشعور بانعدام الوزن', 'كأنك معلّق في الهواء'],
+      ['الأكل والشرب', 'أكل وشرب بشكل طبيعي'],
+      ['قوة الإطلاق', '4-5 جي'],
+      ['قوة إعادة الدخول', '8 جي (لفترة قصيرة)'],
+    ],
+    steps: [
+      { time: 'ما قبل الإطلاق · 5:00 صباحًا', title: 'الاستعدادات الأخيرة', text: 'يستيقظ غاغارين في الساعة الخامسة صباحًا. يساعده المهندسون في ارتداء بدلة الضغط SK-1 — برتقالية اللون الصارخ حتى يمكن العثور عليه بسرعة إذا كان الهبوط خارج المسار. في منصة الإطلاق، يستقل المصعد إلى قمة صاروخ R-7. قبل أن يصعد، يتوقف ليتبول على إطار الحافلة — تقليد لا يزال يلتزم به رواد الفضاء الروس قبل كل إطلاق. يبلغ من العمر 27 عامًا. يصعد إلى كبسولة فوستوك الكروية ويُغلق الفتحة.' },
+      { time: '09:07 بتوقيت موسكو — الإطلاق', title: 'الاشتعال', text: 'تشتعل محركات صاروخ R-7 بارتجاجة تمتص كامل الهيكل. يبث غاغارين في راديوه: <em>"بويخالي!"</em> — "هيا بنا!" يرتفع الصاروخ. تتصاعد قوى الجاذبية بسرعة مع تسارع المركبة عبر الغلاف الجوي السفلي. نبضه يرتفع. الضجيج جسدي — لا يُسمع بل يُحسّ في القص والأسنان والجمجمة. يظل تنفسه وصوته ثابتَين، يُبلّغ مركز التحكم كل 60 ثانية.' },
+      { time: '+9 دقائق 7 ثوانٍ — المدار', title: 'أول إنسان في الفضاء', text: 'تنفصل المرحلة الثالثة. تنطفئ المحركات. كل شيء كان يتذبذب ويضغط ويدوّي يتوقف في صمت تام، مستحيل. يرتفع جسم غاغارين عن المقعد. دفاتره وأقلامه وكل ما لم يُثبَّت يطفو أمام وجهه. يختبر الإحساس الذي لم يشعر به أي إنسان من قبل: انعدام الوزن الحقيقي، المستمر، في مدار حول الأرض. أول وصف له: <em>"شعور انعدام الوزن كان غير مألوف بعض الشيء... تشعر كأنك معلّق في الهواء."</em>' },
+      { time: '+46 دقيقة — فوق المحيط الهادئ', title: 'رؤية الأرض لأول مرة', text: 'من خلال النافذة الصغيرة، يراقب غاغارين انحناء الأرض تحته. الغلاف الجوي يبدو كغشاء أزرق رفيع يتمسك بالسطح. يُبث رسالته الشهيرة: <em>"الأرض زرقاء. يا له من شيء رائع. إنه مذهل."</em> يمكنه رؤية الأعاصير والمحيطات الزرقاء والضباب الخفيف عند الأفق حيث تلتقي الأرض بالفضاء.' },
+      { time: '+60 دقيقة — تسلسل إعادة الدخول', title: 'اشتعال محرك التراجع', text: 'يشتعل محرك التراجع في موعده المحدد، مما يبطئ الكبسولة بما يكفي للخروج من المدار. لكن عطلًا يجعل وحدة الخدمة تفشل في الانفصال النظيف عن كبسولة الهبوط — تبقى متصلة بالكابلات، مما يجعل المركبة تدور بسرعة لعشر دقائق مرعبة عند دخول الغلاف الجوي. لا يُبلّغ غاغارين بذلك بصوت عالٍ. تحترق الكابلات في نهاية المطاف ويحدث الانفصال.' },
+      { time: '+98 دقيقة — كرة نار إعادة الدخول', title: '"أنا أحترق. وداعًا يا رفاق."', text: 'مع اندفاع الكبسولة في الغلاف الجوي، يسخّن الاحتكاك الدرع الواقي إلى أكثر من 5,000 درجة مئوية. تتشكل غمامة بلازما حول الكبسولة تقطع الاتصال اللاسلكي تمامًا. من النافذة، يرى غاغارين ألسنة اللهب. لا يعلم أن هذا طبيعي في إعادة الدخول الجوي. يعتقد حقًا أنه يحترق حتى الموت. يُرسل: <em>"أنا أحترق. وداعًا يا رفاق."</em> لا يسمع مركز التحكم إلا تشويشًا. هو، في الواقع، بخير.' },
+      { time: '+108 دقائق — الهبوط', title: 'عودة إلى الأرض', text: 'على ارتفاع 7,000 متر، تنفجر فتحة الخروج ويقفز غاغارين بالمظلة منفصلًا عن الكبسولة كما هو مصمم. يهبط في حقل بالقرب من نهر الفولغا في منطقة ساراتوف بروسيا. امرأة تدعى آنا تاختاروفا وحفيدتها البالغة من العمر ست سنوات أول بشر يراهم. يسألهم إن كان عندهم هاتف — يحتاج للاتصال بموسكو. في غضون ساعات، يصبح أشهر إنسان حي على وجه الأرض. الرحلة الفضائية الأولى استغرقت بالضبط 108 دقائق.' },
+    ]
+  },
+
+  // Sensation
+  sensation: {
+    launch:    { label: 'الإطلاق',              title: 'نار ورعد',            lead: 'تختفي الأرض بطريقة لم تشعر بها قط من قبل.', body: ['الإحساس الأول هو الاهتزاز. يبدأ في المقعد، يسري في الأرضية، في هيكل الصاروخ، في جسمك. كل شيء يتذبذب في آنٍ واحد. الضجيج جسدي — لا يُسمع بل يُحسّ في القص والأسنان والجمجمة.', 'ثم تتصاعد قوى الجاذبية. في الضغط الديناميكي الأقصى، نحو 90 ثانية من الإطلاق، أنت مثبّت في مقعدك بخمسة أضعاف وزنك. التنفس عسير. وجهك يتهدّل. كل كيلوغرام من جسمك يشعر وكأنه خمسة. ثم: تنقطع المحركات. كل شيء يتوقف. كل اهتزاز، كل صوت، كل قوة تختفي في آنٍ معًا، وفي مكانها — لا شيء. الكتب والأقلام تطفو. ذراعاك تطفوان.'], quotes: [{ text: 'هيا بنا! اهتز الصاروخ، ثم هدأ، ثم شعرت بقوة هائلة تضغط عليّ. لكنني كنت أتنفس بشكل طبيعي.', cite: 'يوري غاغارين، 1961' }, { text: 'عندما قُطعت المحركات الرئيسية، شعر الأمر كأن المركبة توقفت. تنتقل من ضجيج هائل إلى صمت تام في لحظة واحدة.', cite: 'رائد فضاء يصف دخول المدار' }] },
+    orbit:     { label: 'دخول المدار',           title: 'صمت الفضاء',          lead: 'لا يوجد خط تعبره. لا بوابة، لا علامة، لا انتقال تدريجي.', body: ['إدراج المدار ليس حدثًا درامياً. ببساطة يتخفف الغلاف الجوي حتى مستوى لا يمكن اكتشافه بينما تحقق المركبة السرعة الأمامية الدقيقة — نحو 7.7 كم/ثانية — التي تنحني عندها الأرض بعيدًا بنفس معدل سحب الجاذبية نحوها. أنت تسقط بنفس المعدل الذي تبتعد به الأرض عنك.', 'الشيء الأول الذي يفعله معظم رواد الفضاء هو النظر من النافذة. ليس إلى الأجهزة، وليس إلى قوائم المهام — إلى الأرض. الأثر البصري يُوصف بشكل متسق عبر الثقافات والأعمار والجنسيات: شعور بأن الكوكب يبدو جميلًا بشكل لا يصدق، هشًا بشكل لا يُحتمل، وصغيرًا بشكل مقلق.', 'خط أزرق رفيع يفصل العالم عن سواد الفضاء. ذلك الخط هو الغلاف الجوي بأكمله — كل الهواء الذي تنفسه كل كائن حي منذ الأزل، كل الطقس، كل السماء الزرقاء التي رأيتها يومًا — مضغوط في غشاء يبدو من المدار مثل طلاء الزجاج على كرة زجاجية.'], quotes: [{ text: 'ما فاجأني أكثر هو كم يبدو الغلاف الجوي رقيقًا. مجرد شريحة. يبدو هشًا بشكل لا يصدق.', cite: 'رائد فضاء على محطة الفضاء الدولية' }, { text: 'تدخل المدار وتنظر إلى الأرض وتدرك أن الخط الأزرق الرفيع هو كل ما بين الحياة والفراغ.', cite: 'مقابلة ما بعد المهمة' }] },
+    weightless:{ label: 'انعدام الجاذبية',       title: 'طافٍ إلى الأبد',      lead: 'كل إنسان عاش على وجه الأرض شعر بالجاذبية في كل ثانية من حياته. في الفضاء، يتوقف ذلك.', body: ['انعدام الوزن لا يشبه السقوط. على الأقل ليس مثل الإحساس بانقلاب المعدة في لفة أو مصعد. إنه يشعر، كما يصف معظم رواد الفضاء، بلا شيء. كحالة محايدة. كأن الافتراض الأساسي للوجود قد تغيّر. لا إحساس بالشد. لا ثقل في الجسم. ذراعاك لا تتدليان — تطفوان في أي وضع تتركهما فيه.', 'في غضون ساعات، يبدأ الجسم في إدراك ما يعنيه ذلك فيزيولوجيًا. تمتلئ الجيوب الأنفية. الوجه ينتفخ. هناك إحساس مستمر بالامتلاء خلف العينين، صداع خفيف يتلاشى خلال أيام. يؤلم أسفل الظهر مع تمدد العمود الفقري — أحيانًا بشدة في أول 24 ساعة.', 'من أغرب التأثيرات: لا تشعر بأن ساقيك تنتميان لجسمك بالطريقة المعتادة. بدون وزن، تتغير حاسة الإحساس بموضع الأعضاء. يُبلّغ رواد الفضاء أنهم يضطرون إلى النظر إلى ساقيهم لتأكيد موضعهما، خاصة عند النوم.'], quotes: [{ text: 'يشعر الأمر كأنك معلّق في وسط الهواء تمامًا. يمكنك الطفو في أي اتجاه ولا يتطلب الأمر أي جهد على الإطلاق.', cite: 'عضو بعثة محطة الفضاء الدولية' }, { text: 'عندما أغمض عيني، لا أستطيع تحديد أيهما أعلى. لا يوجد أعلى. جسمي في حيرة تامة.', cite: 'رائد فضاء لأول مرة، اليوم الأول من المهمة' }] },
+    sick:      { label: 'دوار الفضاء',           title: 'عندما يثور الجسم',    lead: 'نحو ٧٠٪ من رواد الفضاء يعانون من شكل من أشكال دوار الفضاء. بالنسبة للكثيرين، يكون شديدًا.', body: ['دوار الفضاء — المعروف رسميًا بمتلازمة تكيّف الفضاء — ينجم عن التعارض بين ما تراه العيون وما يُبلّغه الجهاز الدهليزي. على الأرض، تؤكد الأذن الداخلية باستمرار اتجاه الجاذبية. في الفضاء، ترسل إشارات لا معنى لها بينما تقول العيون "أرى أرضية، أرى سقفًا" — لكن هذه تصنيفات اعتباطية في بيئة لا يوجد فيها أعلى أو أسفل حقيقيان.', 'الدماغ، الذي يتلقى بيانات متضاربة لا يستطيع التوفيق بينها، يفسر الموقف على أنه تسمم — نفس الاستجابة للسموم العصبية التي تشوّه الواقع الحسي. يستجيب وفق ذلك: قيء وغثيان وتعرق وارتباك. بالنسبة لبعض رواد الفضاء يكون هذا خفيفًا ويمر في ساعات. بالنسبة لآخرين، يُعجزهم لمدة يومين أو ثلاثة أيام.', 'التحدي العملي: الغثيان والقيء داخل بدلة فضائية أثناء سير في الفضاء — الذي قد يكون مجدولًا في أول أيام المهمة — خطر حقيقي. القيء يمكن أن يسد مجرى الهواء أو يحجب الرؤية داخل خوذة مغلقة.'], quotes: [{ text: 'كنت مريضًا لمدة يومين ونصف. كان بالضبط كأسوأ دوار حركة أصابك على الإطلاق، لكنه مستمر، بدون راحة من الاستلقاء، لأن الاستلقاء لا يفيد في شيء.', cite: 'رائد فضاء على محطة الفضاء الدولية' }, { text: 'كنت أفكر — لو أنني مضطر للقيام بتمشية فضائية الآن، لا أستطيع. جسديًا لا أستطيع. وكان ذلك مخيفًا.', cite: 'رائد فضاء يصف اليوم الثاني من المهمة' }] },
+    adapt:     { label: 'التكيّف',              title: 'الدماغ يعيد برمجة نفسه', lead: 'بعد 3-5 أيام، يتغير شيء ما. يرتفع الارتباك. تعلّم الجسم العيش في الفضاء.', body: ['تكيّف الدماغ مع انعدام الجاذبية من أكثر التظاهرات البارزة للمرونة العصبية. الجهاز الدهليزي يستمر في إرسال إشارات مربكة، لكن الدماغ يتعلم تجاهلها وتصفيتها. الإدراك البصري يصبح مهيمنًا للتوجه المكاني. يبني الدماغ نموذجًا جديدًا — مبنيًا على البصر واللمس وحاسة الإحساس بالوضع بدلًا من الجاذبية.', 'الحالة الناتجة تُوصف باستمرار بالهدوء والخفة — وكثيرًا — النشوة. السهولة الجسدية للتحرك في الجاذبية الصفرية متعة حقيقية بمجرد اكتمال التكيّف. الدفع من جدار والطفو عبر وحدة، القفزات المعكوسة بلا جهد، شرب كرات ماء عائمة، النوم في أي اتجاه — يصف رواد الفضاء هذه التجارب بفرح لا يخطئه القارئ.', 'لكن النوم يظل صعبًا طوال المهمة. لا مرساة للساعة البيولوجية في بيئة تشرق فيها الشمس وتغرب كل 90 دقيقة. مكملات الميلاتونين والتعرض المنظم للضوء الساطع يساعدان، لكن معظم أطقم محطة الفضاء الدولية ينامون نحو 6 ساعات في الليلة مقابل 8.5 موصى بها.'], quotes: [{ text: 'بعد نحو أربعة أيام، استيقظت وكان الأمر... مريحًا. كأن جسمي قرر أن هذا طبيعي. كان كأجمل صباح في حياتي. شعرت بارتياح تام.', cite: 'عضو طاقم طويل الأمد في محطة الفضاء الدولية' }, { text: 'تتوقف عن المقاومة. تتوقف عن محاولة الحفاظ على توجه معين. تترك نفسك تعيش في ثلاثة أبعاد بالتساوي.', cite: 'رائد فضاء حول التكيف مع انعدام الوزن' }] },
+    view:      { label: 'رؤية الأرض',           title: 'تأثير النظرة الشاملة',  lead: 'هناك ظاهرة نفسية موثّقة تصيب معظم رواد الفضاء عندما يرون الأرض من الفضاء لأول مرة. يسميها العلماء تأثير النظرة الشاملة.', body: ['تأثير النظرة الشاملة ليس روحانيًا. إنه إدراكي. عندما ترى الأرض من ارتفاع 400 كيلومتر، غياب الحدود الوطنية، رقة الغلاف الجوي، صغر العالم كله في اتساع الفضاء — هذه الحقائق، التي عرفها البشر دائمًا فكريًا، تصبح حقيقية بشكل حشوي، قاطع، بطريقة لم تكن من قبل.', 'الأوصاف الأكثر شيوعًا: شعور عميق بهشاشة الكوكب؛ عجز عن الاهتمام بالانقسامات بين الأمم أو المجموعات؛ شعور بالانتماء لكل الحياة البشرية في آنٍ واحد؛ ورغبة ساحقة في حماية الخط الأزرق الرفيع من الغلاف الجوي الذي يُديم كل ذلك.', 'رواد فضاء من عشرات الدول والأنظمة السياسية والأديان وصفوا نفس التجربة الجوهرية. قناديل سوفيتيون ورواد فضاء أمريكيون في زمن الحرب الباردة وصفوها. ضباط عسكريون وعلماء يصفونها. يبدو تأثير النظرة الشاملة استجابة بشرية كونية لرؤية الأرض كاملة، من الخارج، لأول مرة.'], quotes: [{ text: 'تطور لديك وعي عالمي فوري، توجه نحو الإنسان، عدم رضا حاد عن حال العالم، وإلحاح للقيام بشيء حيال ذلك.', cite: 'إدغار ميتشل، رائد فضاء أبوللو 14' }, { text: 'تريد أن تمسك سياسيًا من تلابيبه وتسحبه ربع مليون ميل وتقول: "انظر إلى ذلك. ما الذي يستحق القتال من أجله؟"', cite: 'رون غاران، رائد فضاء محطة الفضاء الدولية' }] },
+    return:    { label: 'العودة للأرض',          title: 'تعود الجاذبية',        lead: 'بعد أشهر من انعدام الوزن، الهبوط على الأرض ليس عودة إلى الوطن. إنه تكيّف ثانٍ — ويمكن أن يكون قاسيًا.', body: ['تصطدم كبسولة إعادة الدخول بالأرض وكل شيء لا وزن له يكتسب وزنه فجأة. بالنسبة لرواد الفضاء العائدين من مهمة محطة الفضاء الدولية مدتها ستة أشهر، يُوصف الإحساس الجسدي بعودة الجاذبية بأنه ساحق وغريب وساحق. تكيّف الجسم مع انعدام الوزن بشكل كامل لدرجة أن قوة G الواحدة تبدو كقوة غريبة.', 'التحديات الفورية: الوقوف صعب وقد يكون مستحيلًا بدون مساعدة. المشي غير مستقر — الجهاز الدهليزي، الذي أهمل الجاذبية، يتلقاها من جديد ويجب أن يعيد المعايرة من جديد. الرأس، الذي كان يُحمل بضغط السوائل، يتدلى الآن بشكل ثقيل على الرقبة.', 'على مدى أسابيع وأشهر من إعادة التأهيل، يتكيّف الجسم من جديد. كثافة العظام تتعافى على مدى 2-3 سنوات. كتلة العضلات وقوتها تعودان مع التمرين الموجَّه على مدى 3-6 أشهر. الرؤية تتحسن عادةً. لكن الأقراص الفقرية تنضغط من جديد والعضلات الداعمة الضعيفة يجب أن تحمل وزن العمود الفقري مرة أخرى — تحمل هذه النافذة خطرًا مرتفعًا أربعة أضعاف لانزلاق الغضروف.'], quotes: [{ text: 'كان كل شيء ثقيلًا جدًا. ذراعاي كانتا ثقيلتَين جدًا للرفع بسهولة. رأسي كان ثقيلًا. بعد ستة أشهر من اللاوزن، شعرت قوة G الواحدة كعقوبة.', cite: 'رائد فضاء بعد مهمة 6 أشهر' }, { text: 'حاولت الوقوف ولم أستطع. ليس حقًا. كان يجب أن يُرفعوني. وعندما وقفت، كنت أشعر بكل كيلوغرام من جسمي بشكل منفرد.', cite: 'رائد فضاء حول التكيف بعد المهمة' }] },
+  },
+
+  // Compare
+  compare: {
+    headers: ['الجهاز', '🌍 على الأرض', '🚀 في الفضاء (6 أشهر)'],
+    rows: [
+      { icon:'📏', label:'الطول', earth:'الخط الأساسي الطبيعي', space:'من 3 إلى 5 سم+ (العمود الفقري يتمدد بالكامل)', tag:'better', tagText:'أطول مؤقتًا' },
+      { icon:'🦴', label:'كثافة العظام', earth:'مستقرة مع النشاط اليومي الطبيعي', space:'من 1 إلى 2٪ شهريًا في الورك والعمود الفقري — حتى 10٪ إجمالًا في 6 أشهر', tag:'worse', tagText:'فقدان مستمر كبير' },
+      { icon:'💪', label:'كتلة العضلات', earth:'تُحافَظ عليها بالمشي والوقوف والحركة اليومية', space:'حتى 20٪ في عضلات الساقين بدون تمرين مكثف يومي', tag:'worse', tagText:'ضمور سريع' },
+      { icon:'🫀', label:'القلب', earth:'بيضاوي الشكل قليلًا، يضخ للأعلى ضد الجاذبية', space:'يصبح أكثر كروية؛ ينكمش حتى 25٪؛ حجم الدم ينخفض 15٪', tag:'worse', tagText:'تغييرات هيكلية' },
+      { icon:'💧', label:'توزيع السوائل', earth:'70٪ من سوائل الجسم في النصف السفلي', space:'السوائل تتوزع نحو الجزء العلوي: وجه منتفخ، أنف محتقن، ساقان أنحف', tag:'worse', tagText:'تحوّل سوائل دائم' },
+      { icon:'👁️', label:'الرؤية (القريبة)', earth:'طبيعية، مستقرة طوال حياة البالغين', space:'تتدهور لدى ~40٪ من رواد الفضاء بسبب ارتفاع الضغط داخل الجمجمة', tag:'worse', tagText:'ضعف بصري' },
+      { icon:'🧠', label:'التوجه المكاني', earth:'واضح ومستمر — الجاذبية تحدد "الأسفل" دائمًا', space:'مرتبك لمدة 2-4 أيام؛ الدماغ يعيد البرمجة ويتجاهل الإشارات الدهليزية', tag:'neutral', tagText:'يتكيّف مع الوقت' },
+      { icon:'😴', label:'النوم', earth:'منظم بدورة ضوء/ظلام واحدة مدتها 24 ساعة', space:'16 شروقًا يوميًا؛ نوم ~6 ساعات مزمن مقابل 8.5 ساعة موصى بها', tag:'worse', tagText:'اضطراب بيولوجي' },
+      { icon:'☢️', label:'التعرض للإشعاع', earth:'~3 ميلي سيفرت سنويًا (مستوى السطح)', space:'~80-180 ميلي سيفرت سنويًا على محطة الفضاء الدولية', tag:'worse', tagText:'27-60 ضعف' },
+      { icon:'🛡️', label:'الجهاز المناعي', earth:'يعمل بشكل طبيعي؛ الفيروسات الكامنة خاملة', space:'~47٪ معدل إعادة تنشيط الفيروسات؛ نشاط الخلايا التائية منخفض', tag:'worse', tagText:'خلل مناعي' },
+      { icon:'🦷', label:'خطر آلام الظهر', earth:'خطر السكان الأساسي', space:'خطر الانزلاق الغضروفي 4 أضعاف خلال إعادة التكيّف مع الجاذبية', tag:'worse', tagText:'نافذة خطر بعد المهمة' },
+      { icon:'🌡️', label:'المزاج', earth:'خط أساسي، يتأثر بضغوط الأرض', space:'غثيان وارتباك ← ثم هدوء ونشوة بعد التكيف', tag:'neutral', tagText:'يتحسن بعد اليوم 4' },
+      { icon:'🏃', label:'القدرة على التمرين', earth:'اللياقة الهوائية الأساسية', space:'~15٪ انخفاض في الحد الأقصى للأكسجين حتى مع ساعتين يوميًا', tag:'worse', tagText:'تدهور مستمر' },
+      { icon:'👃', label:'الطعم والشم', earth:'حدة طبيعية', space:'يضعف — السوائل تملأ الجيوب الأنفية مما يقلل إدراك النكهة', tag:'worse', tagText:'بسبب الاحتقان' },
+    ]
+  }
+};
+
+// ════════════════════════════════════════════
+// VOSTOK 1 — 3D MODEL (Three.js)
+// ════════════════════════════════════════════
+let vostokReady = false;
+let vostokRenderer, vostokScene, vostokCamera, vostokShip;
+let vostokAnimId = null;
+let vostokDrag = { active: false, prevX: 0, prevY: 0 };
+let vostokRot = { x: 0.25, y: 0.6 };
+let vostokZoom = 7;
+let vostokAutoSpin = true;
+let vostokLastTouchDist = 0;
+
+function initVostok() {
+  if (vostokReady) { if (vostokAnimId === null) vostokAnimate(); return; }
+  if (typeof THREE === 'undefined') {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+    s.onload = initVostok;
+    document.head.appendChild(s);
+    return;
+  }
+  vostokReady = true;
+
+  const canvas = document.getElementById('vostok-canvas');
+  const W = canvas.clientWidth || 600;
+  const H = canvas.clientHeight || 500;
+
+  vostokRenderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  vostokRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  vostokRenderer.setSize(W, H);
+
+  vostokScene = new THREE.Scene();
+
+  // Stars
+  const starPts = [];
+  for (let i = 0; i < 2400; i++) {
+    const r = 80 + Math.random() * 120;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    starPts.push(r * Math.sin(phi) * Math.cos(theta), r * Math.cos(phi), r * Math.sin(phi) * Math.sin(theta));
+  }
+  const starGeo = new THREE.BufferGeometry();
+  starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPts, 3));
+  vostokScene.add(new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.4, sizeAttenuation: true })));
+
+  // Camera
+  vostokCamera = new THREE.PerspectiveCamera(42, W / H, 0.1, 800);
+  vostokCamera.position.set(0, 0, vostokZoom);
+
+  // Lighting
+  vostokScene.add(new THREE.AmbientLight(0x223355, 1.1));
+  const sun = new THREE.DirectionalLight(0xfff4e0, 3);
+  sun.position.set(6, 9, 5);
+  vostokScene.add(sun);
+  const fill = new THREE.PointLight(0x2255aa, 0.7, 40);
+  fill.position.set(-6, -4, 4);
+  vostokScene.add(fill);
+  const rim = new THREE.PointLight(0x88aaff, 0.4, 30);
+  rim.position.set(0, -8, -4);
+  vostokScene.add(rim);
+
+  // ── Build Vostok 1 ──
+  const ship = new THREE.Group();
+
+  const matCapsule  = new THREE.MeshPhongMaterial({ color: 0xd8cdb8, specular: 0x999999, shininess: 70 });
+  const matModule   = new THREE.MeshPhongMaterial({ color: 0x2e4228, specular: 0x1a2a18, shininess: 15 });
+  const matStripe   = new THREE.MeshPhongMaterial({ color: 0x1a3a88, specular: 0x112255, shininess: 8 });
+  const matStripe2  = new THREE.MeshPhongMaterial({ color: 0x243a6a, specular: 0x112255, shininess: 8 });
+  const matNozzle   = new THREE.MeshPhongMaterial({ color: 0x444444, specular: 0x333333, shininess: 35 });
+  const matRing     = new THREE.MeshPhongMaterial({ color: 0x8899aa, specular: 0x556677, shininess: 55 });
+  const matAntenna  = new THREE.MeshPhongMaterial({ color: 0xcccccc, specular: 0x888888, shininess: 90 });
+  const matWindow   = new THREE.MeshPhongMaterial({ color: 0x1a4a8a, specular: 0x88aaff, shininess: 220, transparent: true, opacity: 0.88 });
+  const matHeat     = new THREE.MeshPhongMaterial({ color: 0x4a3a28, specular: 0x222222, shininess: 5 });
+
+  // 1. Descent sphere (Sharik) — top of craft
+  const sphere = new THREE.Mesh(new THREE.SphereGeometry(1.15, 48, 48), matCapsule);
+  sphere.position.y = 1.85;
+  ship.add(sphere);
+
+  // Heat shield bottom half of sphere (darker ablative coating)
+  const heatShield = new THREE.Mesh(new THREE.SphereGeometry(1.16, 48, 24, 0, Math.PI * 2, Math.PI * 0.5, Math.PI * 0.5), matHeat);
+  heatShield.position.y = 1.85;
+  ship.add(heatShield);
+
+  // Porthole window
+  const pDir = new THREE.Vector3(0.9, 0.25, 0.35).normalize();
+  const pPos = new THREE.Vector3(0, 1.85, 0).add(pDir.clone().multiplyScalar(1.17));
+  const porthole = new THREE.Mesh(new THREE.CircleGeometry(0.17, 24), matWindow);
+  porthole.position.copy(pPos);
+  porthole.lookAt(pPos.clone().add(pDir));
+  ship.add(porthole);
+  // Porthole rim
+  const pRim = new THREE.Mesh(new THREE.RingGeometry(0.17, 0.21, 24), matRing);
+  pRim.position.copy(pPos.clone().add(pDir.clone().multiplyScalar(0.01)));
+  pRim.lookAt(pPos.clone().add(pDir));
+  ship.add(pRim);
+
+  // 2. Separation ring
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.58, 0.055, 14, 64), matRing);
+  ring.position.y = 0.68;
+  ring.rotation.x = Math.PI / 2;
+  ship.add(ring);
+  // Bolts on ring
+  for (let i = 0; i < 14; i++) {
+    const a = (i / 14) * Math.PI * 2;
+    const bolt = new THREE.Mesh(new THREE.SphereGeometry(0.028, 7, 7), matRing);
+    bolt.position.set(Math.cos(a) * 0.58, 0.68, Math.sin(a) * 0.58);
+    ship.add(bolt);
+  }
+
+  // 3. Instrument module (frustum: wide top near sphere, narrow at bottom)
+  const instrMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.58, 1.12, 2.5, 40), matModule);
+  instrMesh.position.y = -0.58;
+  ship.add(instrMesh);
+
+  // Longitudinal solar-panel stripes on instrument module
+  for (let i = 0; i < 10; i++) {
+    const a = (i / 10) * Math.PI * 2;
+    const mat = i % 2 === 0 ? matStripe : matStripe2;
+    const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.04, 2.4, 0.14), mat);
+    const r = 0.88;
+    stripe.position.set(Math.cos(a) * r, -0.58, Math.sin(a) * r);
+    stripe.rotation.y = -a;
+    ship.add(stripe);
+  }
+
+  // 4. Retrorocket housing (bottom of instrument module)
+  const rktHousing = new THREE.Mesh(new THREE.CylinderGeometry(1.08, 0.85, 0.45, 32), matNozzle);
+  rktHousing.position.y = -1.9;
+  ship.add(rktHousing);
+
+  // Nozzle bell
+  const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.48, 0.55, 24), matNozzle);
+  nozzle.position.y = -2.37;
+  ship.add(nozzle);
+
+  // Inner nozzle glow ring
+  const nozzleInner = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, 0.1, 24), new THREE.MeshPhongMaterial({ color: 0x332200, emissive: 0x110800, shininess: 2 }));
+  nozzleInner.position.y = -2.63;
+  ship.add(nozzleInner);
+
+  // 5. Antenna array — 4 whip antennas from upper sphere
+  const sphereCenter = new THREE.Vector3(0, 1.85, 0);
+  const antDirs = [
+    new THREE.Vector3(0, 1, 1).normalize(),
+    new THREE.Vector3(0, 1, -1).normalize(),
+    new THREE.Vector3(1, 1, 0).normalize(),
+    new THREE.Vector3(-1, 1, 0).normalize(),
+  ];
+  antDirs.forEach(dir => {
+    const len = 1.05;
+    const antGeo = new THREE.CylinderGeometry(0.013, 0.006, len, 6);
+    const ant = new THREE.Mesh(antGeo, matAntenna);
+    const surfPt = sphereCenter.clone().add(dir.clone().multiplyScalar(1.15));
+    ant.position.copy(surfPt.clone().add(dir.clone().multiplyScalar(len / 2)));
+    ant.setRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir));
+    ship.add(ant);
+    // Small ball tip
+    const tip = new THREE.Mesh(new THREE.SphereGeometry(0.025, 6, 6), matAntenna);
+    tip.position.copy(surfPt.clone().add(dir.clone().multiplyScalar(len)));
+    ship.add(tip);
+  });
+
+  vostokShip = ship;
+  vostokScene.add(ship);
+
+  // ── Controls ──
+  canvas.addEventListener('mousedown', e => {
+    vostokDrag.active = true;
+    vostokDrag.prevX = e.clientX;
+    vostokDrag.prevY = e.clientY;
+    vostokAutoSpin = false;
+  });
+  window.addEventListener('mouseup', () => { vostokDrag.active = false; });
+  window.addEventListener('mousemove', e => {
+    if (!vostokDrag.active) return;
+    vostokRot.y += (e.clientX - vostokDrag.prevX) * 0.007;
+    vostokRot.x += (e.clientY - vostokDrag.prevY) * 0.007;
+    vostokRot.x = Math.max(-1.4, Math.min(1.4, vostokRot.x));
+    vostokDrag.prevX = e.clientX;
+    vostokDrag.prevY = e.clientY;
+  });
+  canvas.addEventListener('wheel', e => {
+    e.preventDefault();
+    vostokZoom = Math.max(3.5, Math.min(14, vostokZoom + e.deltaY * 0.012));
+  }, { passive: false });
+  canvas.addEventListener('touchstart', e => {
+    vostokAutoSpin = false;
+    if (e.touches.length === 1) {
+      vostokDrag.active = true;
+      vostokDrag.prevX = e.touches[0].clientX;
+      vostokDrag.prevY = e.touches[0].clientY;
+    } else if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      vostokLastTouchDist = Math.sqrt(dx * dx + dy * dy);
+    }
+  }, { passive: true });
+  canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (e.touches.length === 1 && vostokDrag.active) {
+      vostokRot.y += (e.touches[0].clientX - vostokDrag.prevX) * 0.007;
+      vostokRot.x += (e.touches[0].clientY - vostokDrag.prevY) * 0.007;
+      vostokRot.x = Math.max(-1.4, Math.min(1.4, vostokRot.x));
+      vostokDrag.prevX = e.touches[0].clientX;
+      vostokDrag.prevY = e.touches[0].clientY;
+    } else if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (vostokLastTouchDist) vostokZoom *= vostokLastTouchDist / dist;
+      vostokZoom = Math.max(3.5, Math.min(14, vostokZoom));
+      vostokLastTouchDist = dist;
+    }
+  }, { passive: false });
+  canvas.addEventListener('touchend', () => { vostokDrag.active = false; vostokLastTouchDist = 0; });
+
+  // Resize
+  window.addEventListener('resize', () => {
+    const W = canvas.clientWidth;
+    const H = canvas.clientHeight;
+    if (!W || !H) return;
+    vostokRenderer.setSize(W, H);
+    vostokCamera.aspect = W / H;
+    vostokCamera.updateProjectionMatrix();
+  });
+
+  vostokAnimate();
+}
+
+function vostokAnimate() {
+  vostokAnimId = requestAnimationFrame(vostokAnimate);
+  if (vostokAutoSpin) vostokRot.y += 0.004;
+  vostokShip.rotation.x = vostokRot.x;
+  vostokShip.rotation.y = vostokRot.y;
+  vostokCamera.position.set(0, 0, vostokZoom);
+  vostokCamera.lookAt(0, 0, 0);
+
+  // Update floating labels
+  updateVostokLabels();
+
+  vostokRenderer.render(vostokScene, vostokCamera);
+}
+
+const VOSTOK_LABEL_POINTS = [
+  { pos: new THREE.Vector3(0, 3.05, 0),    en: 'Descent Module',    ar: 'كبسولة الهبوط',     side: 'r' },
+  { pos: new THREE.Vector3(0, -0.58, 1.2), en: 'Instrument Module', ar: 'وحدة الأجهزة',      side: 'r' },
+  { pos: new THREE.Vector3(0, -2.4, 0.6),  en: 'TDU-1 Retrorocket', ar: 'محرك التراجع',      side: 'r' },
+  { pos: new THREE.Vector3(-1.2, 2.9, 0),  en: 'Antenna Array',     ar: 'مصفوفة الهوائيات',  side: 'l' },
+  { pos: new THREE.Vector3(1.35, 1.85, 0), en: 'Porthole Window',   ar: 'نافذة الكوة',       side: 'r' },
+  { pos: new THREE.Vector3(0, 0.68, 1),    en: 'Separation Ring',   ar: 'حلقة الفصل',        side: 'r' },
+];
+
+function updateVostokLabels() {
+  const labelsDiv = document.getElementById('vostok-labels');
+  if (!labelsDiv || !vostokCamera) return;
+  const canvas = document.getElementById('vostok-canvas');
+  const W = canvas.clientWidth;
+  const H = canvas.clientHeight;
+
+  const lang = typeof currentLang !== 'undefined' ? currentLang : 'en';
+  labelsDiv.innerHTML = VOSTOK_LABEL_POINTS.map(lp => {
+    const worldPt = lp.pos.clone().applyEuler(vostokShip.rotation);
+    const projected = worldPt.clone().project(vostokCamera);
+    const x = (projected.x * 0.5 + 0.5) * W;
+    const y = (-projected.y * 0.5 + 0.5) * H;
+    if (projected.z > 1) return '';
+    const isLeft = lp.side === 'l';
+    const text = lang === 'ar' ? lp.ar : lp.en;
+    return `<div class="v-label" style="left:${x}px;top:${y}px;transform:translate(${isLeft ? '-100%' : '0'},-50%);flex-direction:${isLeft ? 'row-reverse' : 'row'}">
+      <div class="v-label-line"></div>
+      <span>${text}</span>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════
+// LANGUAGE SWITCHING
+// ════════════════════════════════════════════
+let currentLang = 'en';
+
+const langBtn = document.getElementById('langBtn');
+langBtn.addEventListener('click', () => {
+  currentLang = currentLang === 'en' ? 'ar' : 'en';
+  applyLanguage(currentLang);
+});
+
+function applyLanguage(lang) {
+  const root = document.documentElement;
+  root.setAttribute('lang', lang);
+  root.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+
+  // Sync mobile nav
+  document.querySelectorAll('.mobile-nav').forEach(n => n.innerHTML = '');
+
+  if (lang === 'ar') {
+    langBtn.textContent = AR.nav.langSwitch;
+    applyArabic();
+  } else {
+    langBtn.textContent = '🌐 العربية';
+    applyEnglish();
+  }
+
+  // Rebuild all active panels
+  const activePanel = document.querySelector('.panel.active');
+  if (activePanel) {
+    const id = activePanel.id.replace('panel-', '');
+    rebuildPanel(id, lang);
+  }
+
+  // Rebuild mobile nav
+  document.querySelectorAll('.navlink').forEach(l => {
+    const clone = l.cloneNode(true);
+    clone.addEventListener('click', () => showPanel(clone.dataset.panel));
+    document.getElementById('mobileNav').appendChild(clone);
+  });
+}
+
+function applyArabic() {
+  // Nav links
+  const labels = {
+    systems: AR.nav.systems, timeline: AR.nav.timeline,
+    gagarin: AR.nav.gagarin, charts: AR.nav.charts,
+    sensation: AR.nav.sensation, compare: AR.nav.compare,
+    vostok: AR.nav.vostok,
+  };
+  document.querySelectorAll('.navlink').forEach(l => {
+    const span = l.querySelectorAll('span')[1];
+    if (span && labels[l.dataset.panel]) span.textContent = labels[l.dataset.panel];
+  });
+  document.querySelector('.sidenav-logo span').textContent = AR.nav.logo;
+  document.querySelector('.topbar-logo').textContent = '✦ ' + AR.nav.logo;
+}
+
+function applyEnglish() {
+  const labels = {
+    systems: 'Body Systems', timeline: 'Mission Clock',
+    gagarin: 'First Human', charts: 'Data & Charts',
+    sensation: 'The Sensation', compare: 'Earth vs Space',
+    vostok: 'Vostok 1',
+  };
+  document.querySelectorAll('.navlink').forEach(l => {
+    const span = l.querySelectorAll('span')[1];
+    if (span && labels[l.dataset.panel]) span.textContent = labels[l.dataset.panel];
+  });
+  document.querySelector('.sidenav-logo span').textContent = 'Space Biology';
+  document.querySelector('.topbar-logo').textContent = '✦ Space Biology';
+}
+
+function rebuildPanel(id, lang) {
+  // Update panel header
+  const T = lang === 'ar' ? AR.panels[id] : null;
+  if (T) {
+    const ph = document.querySelector(`#panel-${id} .panel-header`);
+    if (ph) {
+      ph.querySelector('.ph-eyebrow').textContent = T.eyebrow;
+      ph.querySelector('.ph-title').innerHTML = T.title;
+      ph.querySelector('.ph-sub').textContent = T.sub;
+    }
+  } else {
+    // Reset panel headers to English
+    const EN = {
+      systems:   { eyebrow: 'Interactive Explorer',     title: 'The <em>Human Body</em> in Space',          sub: 'Click any glowing point on the body to explore what microgravity does to that system — in detail.' },
+      timeline:  { eyebrow: 'Interactive Timeline',     title: 'Mission <em>Clock</em>',                    sub: 'Drag the slider to move through a 6-month mission. Watch how each body system degrades — and what the daily consequences are.' },
+      gagarin:   { eyebrow: 'April 12, 1961',           title: 'The <em>First Human</em> in Space',         sub: 'A minute-by-minute account of Yuri Gagarin\'s 108-minute flight — the most significant journey in human history.' },
+      charts:    { eyebrow: 'Research Data',            title: '<em>Charts</em> &amp; Data',                sub: 'Visualized data from ISS long-duration missions showing how each body system changes over time.' },
+      sensation: { eyebrow: 'First-Person Experience',  title: 'What It <em>Feels Like</em>',               sub: 'The sensory and emotional experience of spaceflight — from launch through long-duration weightlessness, told as astronauts have described it.' },
+      compare:   { eyebrow: 'Side-by-Side Comparison',  title: 'Earth <em>vs.</em> Space',                  sub: 'Every major physiological difference between life on Earth and a 6-month space mission.' },
+      vostok:    { eyebrow: 'April 12, 1961 · First Crewed Spacecraft', title: 'Vostok <em>1</em>',          sub: 'The spacecraft that carried Yuri Gagarin into orbit. Drag to rotate · Scroll to zoom · Pinch on mobile.' },
+    };
+    const E = EN[id];
+    if (E) {
+      const ph = document.querySelector(`#panel-${id} .panel-header`);
+      if (ph) {
+        ph.querySelector('.ph-eyebrow').textContent = E.eyebrow;
+        ph.querySelector('.ph-title').innerHTML = E.title;
+        ph.querySelector('.ph-sub').textContent = E.sub;
+      }
+    }
+  }
+
+  // Rebuild panel-specific content
+  if (id === 'systems') {
+    // Clear active system and rebuild empty state
+    document.querySelectorAll('.hs').forEach(h => h.classList.remove('active'));
+    document.getElementById('sys-content').style.display = 'none';
+    document.getElementById('sys-empty').style.display = '';
+    document.getElementById('env-badge').textContent = lang === 'ar' ? '🌍 على الأرض' : '🌍 On Earth';
+    document.getElementById('env-badge').classList.remove('space');
+    if (lang === 'ar') {
+      document.getElementById('sys-empty').querySelector('h3').textContent = 'اختر جهازًا من أجهزة الجسم';
+      document.getElementById('sys-empty').querySelector('p').textContent = 'انقر على أي نقطة متوهجة على الشكل البشري لاستكشاف ما يفعله انعدام الجاذبية بذلك الجزء من الجسم';
+    } else {
+      document.getElementById('sys-empty').querySelector('h3').textContent = 'Select a body system';
+      document.getElementById('sys-empty').querySelector('p').textContent = 'Click any glowing point on the human figure to the left to explore what microgravity does to that part of the body';
+    }
+  }
+
+  if (id === 'timeline') {
+    const slider = document.getElementById('mission-slider');
+    updateTimelineAr(parseInt(slider.value), lang);
+  }
+
+  if (id === 'gagarin') {
+    document.getElementById('gg-story')._built = false;
+    buildGagarin(lang);
+  }
+
+  if (id === 'sensation') {
+    showSensation(document.querySelector('.sn-btn.active')?.dataset.sense || 'launch', lang);
+    // Update nav buttons
+    document.querySelectorAll('.sn-btn').forEach(b => {
+      const key = b.dataset.sense;
+      b.textContent = lang === 'ar' ? (AR.sensationNav[key] || b.textContent) : {
+        launch:'Launch', orbit:'Entering Orbit', weightless:'Weightlessness',
+        sick:'Space Sickness', adapt:'Adaptation', view:'Seeing Earth', return:'Coming Home'
+      }[key];
+    });
+  }
+
+  if (id === 'compare') {
+    document.getElementById('compare-grid')._built = false;
+    buildCompare(lang);
+  }
+}
+
+// Patch updateTimeline to support Arabic
+const _origUpdate = updateTimeline;
+window.updateTimeline = function(val) {
+  updateTimelineAr(parseInt(val), currentLang);
+};
+
+function updateTimelineAr(d, lang) {
+  document.getElementById('clock-day').textContent = (lang === 'ar' ? AR.clock.dayPrefix : 'Day ') + d;
+  if (lang === 'ar') {
+    const phase = AR.clock.phases.find((_, i) => {
+      const PHASE_DAYS = [1,3,8,21,60,90,150];
+      const end = PHASE_DAYS[i+1] || 180;
+      return d >= PHASE_DAYS[i] && d <= end;
+    }) || AR.clock.phases[AR.clock.phases.length - 1];
+    document.getElementById('clock-phase').textContent = phase.name;
+    document.getElementById('clock-narrative').textContent = phase.text;
+  } else {
+    const phase = getPhase(d);
+    document.getElementById('clock-phase').textContent = phase.name;
+    document.getElementById('clock-narrative').textContent = phase.text;
+  }
+  buildMetricGrid(d);
+}
+
+// Patch selectSystem to use Arabic data
+const _origRenderSys = renderSystem;
+window.renderSystem = function(id) {
+  if (currentLang !== 'ar') { _origRenderSys(id); return; }
+  const data = AR.systems[id] || SYSTEMS[id];
+  const content = document.getElementById('sys-content');
+  const empty   = document.getElementById('sys-empty');
+  empty.style.display = 'none';
+  content.style.display = 'block';
+  const base = SYSTEMS[id];
+  content.innerHTML = `
+    <div class="sc-hero">
+      <div class="sc-top">
+        <div class="sc-icon-wrap" style="background:${base.color}20">${base.icon}</div>
+        <div class="sc-title-area">
+          <div class="sc-title">${data.title}</div>
+          <span class="sc-badge" style="background:${base.color}1a;color:${base.color}">${data.category}</span>
+        </div>
+      </div>
+      <p class="sc-desc">${data.desc}</p>
+    </div>
+    <div class="sc-body">
+      <div class="sc-bars">
+        ${data.bars.map(b => `
+          <div class="sb-item">
+            <div class="sb-row">
+              <span class="sb-name">${b.name}</span>
+              <span class="sb-val">${b.label}</span>
+            </div>
+            <div class="sb-row">
+              <div class="sb-track"><div class="sb-fill" data-width="${b.val}" style="background:${b.color}"></div></div>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div class="sc-pills">
+        ${data.pills.map(p => `
+          <div class="sc-pill">
+            <div class="dot" style="background:${p.color}"></div>
+            ${p.text}
+          </div>`).join('')}
+      </div>
+    </div>`;
+  requestAnimationFrame(() => {
+    content.querySelectorAll('.sb-fill').forEach(el => { el.style.width = el.dataset.width + '%'; });
+  });
+};
+
+// Patch buildGagarin
+const _origGagarin = buildGagarin;
+window.buildGagarin = function(lang) {
+  lang = lang || currentLang;
+  const container = document.getElementById('gg-story');
+  if (container._built) return;
+  container._built = true;
+  const steps = lang === 'ar' ? AR.gagarin.steps : STEPS;
+  container.innerHTML = steps.map((s, i) => `
+    <div class="gg-step ${i === 0 ? 'active' : ''}" onclick="activateStep(this)">
+      <div class="ggs-marker">
+        <div class="ggs-dot"></div>
+        ${i < steps.length - 1 ? '<div class="ggs-line"></div>' : ''}
+      </div>
+      <div class="ggs-body">
+        <div class="ggs-time">${s.time}</div>
+        <div class="ggs-title">${s.title}</div>
+        <div class="ggs-text">${s.text}</div>
+      </div>
+    </div>`).join('');
+
+  // Update aside dossier if Arabic
+  if (lang === 'ar') {
+    const d = AR.gagarin.dossier;
+    const aside = document.querySelector('.gg-aside');
+    if (aside) {
+      aside.querySelector('.gg-dossier-title') && (aside.querySelector('.gg-dossier-title').textContent = d.title);
+      aside.querySelector('.gg-name').textContent = d.name;
+      aside.querySelector('.gg-role').textContent = d.role;
+      aside.querySelector('.gg-quote-card blockquote').textContent = d.quote;
+      aside.querySelector('.gg-quote-card cite').textContent = d.quoteCite;
+      aside.querySelector('.gg-context-title').textContent = AR.gagarin.bodyDataTitle;
+      // Translate the mission stats (Age, Spacecraft, etc.)
+      const factsEl = aside.querySelector('.gg-facts');
+      if (factsEl) factsEl.innerHTML = d.fields.map(([k,v]) => `<div class="gg-fact"><span>${k}</span><strong>${v}</strong></div>`).join('');
+      // Translate the body data section
+      const bdEl = aside.querySelector('.gg-body-data');
+      if (bdEl) bdEl.innerHTML = AR.gagarin.bodyData.map(([k,v]) => `<div><span>${k}</span><strong>${v}</strong></div>`).join('');
+    } else {
+      // Restore English aside
+      const aside = document.querySelector('.gg-aside');
+      if (aside) {
+        aside.querySelector('.gg-name').textContent = 'Yuri Alekseyevich Gagarin';
+        aside.querySelector('.gg-role').textContent = 'Soviet Air Force Pilot · Cosmonaut';
+        aside.querySelector('.gg-quote-card blockquote').innerHTML = 'The Earth is blue.<br>How wonderful.<br>It is amazing.';
+        aside.querySelector('.gg-quote-card cite').textContent = '— In orbit, April 12, 1961';
+        aside.querySelector('.gg-context-title').textContent = 'Body data during flight';
+        const factsEl = aside.querySelector('.gg-facts');
+        if (factsEl) factsEl.innerHTML = [
+          ['Age','27 years'],['Spacecraft','Vostok 1'],['Duration','108 minutes'],
+          ['Orbits','1'],['Altitude','327 km'],['Speed','27,400 km/h'],
+          ['Heart rate','64 bpm (calm)'],['Landing','Saratov, Russia']
+        ].map(([k,v]) => `<div class="gg-fact"><span>${k}</span><strong>${v}</strong></div>`).join('');
+        const bdEl = aside.querySelector('.gg-body-data');
+        if (bdEl) bdEl.innerHTML = [
+          ['Heart rate at launch','~100 bpm'],['Heart rate in orbit','64 bpm'],
+          ['Breathing rate','Normal'],['Weightlessness felt','Like being suspended'],
+          ['Food/drink','Ate and drank normally'],['G-force at launch','4–5 G'],
+          ['Re-entry G-force','8 G (briefly)']
+        ].map(([k,v]) => `<div><span>${k}</span><strong>${v}</strong></div>`).join('');
+      }
+    }
+  }
+};
+
+// Patch showSensation
+const _origSensation = showSensation;
+window.showSensation = function(id, lang) {
+  lang = lang || currentLang;
+  document.querySelectorAll('.sn-btn').forEach(b => b.classList.toggle('active', b.dataset.sense === id));
+  const data = lang === 'ar' ? AR.sensation[id] : SENSATIONS[id];
+  const content = document.getElementById('sensation-content');
+  content.innerHTML = `
+    <div class="sense-card">
+      <div class="sense-hero">
+        <div class="sense-label">${data.label}</div>
+        <div class="sense-title">${data.title}</div>
+        <p class="sense-lead">${data.lead}</p>
+      </div>
+      <div class="sense-body">
+        ${data.body.map(p => `<p>${p}</p>`).join('')}
+      </div>
+      <div class="sense-quotes">
+        ${data.quotes.map(q => `
+          <div class="sense-q">${q.text}<cite>— ${q.cite}</cite></div>`).join('')}
+      </div>
+    </div>`;
+};
+
+// Patch buildCompare
+const _origCompare = buildCompare;
+window.buildCompare = function(lang) {
+  lang = lang || currentLang;
+  const grid = document.getElementById('compare-grid');
+  grid._built = true;
+  if (lang === 'ar') {
+    const H = AR.compare.headers;
+    grid.innerHTML = `
+      <div class="cmp-header-row">
+        <div style="color:var(--mid)">${H[0]}</div>
+        <div>${H[1]}</div>
+        <div>${H[2]}</div>
+      </div>` +
+      AR.compare.rows.map(r => `
+        <div class="cmp-row">
+          <div class="cmp-label"><span class="clabel-icon">${r.icon}</span>${r.label}</div>
+          <div class="cmp-earth">${r.earth}</div>
+          <div class="cmp-space">
+            ${r.space}
+            <br><span class="cmp-tag tag-${r.tag}">${r.tagText}</span>
+          </div>
+        </div>`).join('');
+  } else {
+    grid._built = false;
+    _origCompare();
+  }
+};
+
+</script>
 </body>
 </html>
