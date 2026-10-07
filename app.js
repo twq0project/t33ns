@@ -2045,10 +2045,10 @@ function rebuildPanel(id, lang) {
     const slider = document.getElementById('mission-slider');
     // Translate clock marks
     const markLabels = lang === 'ar'
-      ? ['ي١','أ١','ش١','ش٢','ش٣','ش٤','ش٥','ش٦']
+      ? AR.clock.marks
       : ['D1','W1','M1','M2','M3','M4','M5','M6'];
     document.querySelectorAll('.clock-marks span').forEach((el, i) => {
-      if (markLabels[i]) el.textContent = markLabels[i];
+      if (markLabels[i] !== undefined) el.textContent = markLabels[i];
     });
     updateTimelineAr(parseInt(slider.value), lang);
   }
