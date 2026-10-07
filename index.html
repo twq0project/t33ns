@@ -2584,8 +2584,10 @@ function initVostok() {
   vostokReady = true;
 
   const canvas = document.getElementById('vostok-canvas');
-  const W = canvas.clientWidth || 600;
-  const H = canvas.clientHeight || 500;
+  const wrap = canvas.parentElement;
+  const rect = wrap.getBoundingClientRect();
+  const W = rect.width || canvas.offsetWidth || 600;
+  const H = rect.height || canvas.offsetHeight || 500;
 
   vostokRenderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   vostokRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -2726,6 +2728,15 @@ function initVostok() {
   vostokShip = ship;
   vostokScene.add(ship);
 
+  VOSTOK_LABEL_POINTS = [
+    { pos: new THREE.Vector3(0, 3.05, 0),    en: 'Descent Module',    ar: 'كبسولة الهبوط',     side: 'r' },
+    { pos: new THREE.Vector3(0, -0.58, 1.2), en: 'Instrument Module', ar: 'وحدة الأجهزة',      side: 'r' },
+    { pos: new THREE.Vector3(0, -2.4, 0.6),  en: 'TDU-1 Retrorocket', ar: 'محرك التراجع',      side: 'r' },
+    { pos: new THREE.Vector3(-1.2, 2.9, 0),  en: 'Antenna Array',     ar: 'مصفوفة الهوائيات',  side: 'l' },
+    { pos: new THREE.Vector3(1.35, 1.85, 0), en: 'Porthole Window',   ar: 'نافذة الكوة',       side: 'r' },
+    { pos: new THREE.Vector3(0, 0.68, 1),    en: 'Separation Ring',   ar: 'حلقة الفصل',        side: 'r' },
+  ];
+
   // ── Controls ──
   canvas.addEventListener('mousedown', e => {
     vostokDrag.active = true;
@@ -2779,8 +2790,9 @@ function initVostok() {
 
   // Resize
   window.addEventListener('resize', () => {
-    const W = canvas.clientWidth;
-    const H = canvas.clientHeight;
+    const r = wrap.getBoundingClientRect();
+    const W = r.width || 600;
+    const H = r.height || 500;
     if (!W || !H) return;
     vostokRenderer.setSize(W, H);
     vostokCamera.aspect = W / H;
@@ -2804,14 +2816,8 @@ function vostokAnimate() {
   vostokRenderer.render(vostokScene, vostokCamera);
 }
 
-const VOSTOK_LABEL_POINTS = [
-  { pos: new THREE.Vector3(0, 3.05, 0),    en: 'Descent Module',    ar: 'كبسولة الهبوط',     side: 'r' },
-  { pos: new THREE.Vector3(0, -0.58, 1.2), en: 'Instrument Module', ar: 'وحدة الأجهزة',      side: 'r' },
-  { pos: new THREE.Vector3(0, -2.4, 0.6),  en: 'TDU-1 Retrorocket', ar: 'محرك التراجع',      side: 'r' },
-  { pos: new THREE.Vector3(-1.2, 2.9, 0),  en: 'Antenna Array',     ar: 'مصفوفة الهوائيات',  side: 'l' },
-  { pos: new THREE.Vector3(1.35, 1.85, 0), en: 'Porthole Window',   ar: 'نافذة الكوة',       side: 'r' },
-  { pos: new THREE.Vector3(0, 0.68, 1),    en: 'Separation Ring',   ar: 'حلقة الفصل',        side: 'r' },
-];
+// Initialized lazily inside initVostok() after THREE is loaded
+let VOSTOK_LABEL_POINTS = [];
 
 function updateVostokLabels() {
   const labelsDiv = document.getElementById('vostok-labels');
