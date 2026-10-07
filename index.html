@@ -871,24 +871,40 @@ html[lang="ar"] .ph-title { font-size: clamp(1.8rem, 3.5vw, 3rem); }
   .vostok-layout { grid-template-columns: 1fr; height: auto; }
   .vostok-canvas-wrap { height: 55vw; min-height: 300px; }
 }
-/* Vostok panel is always LTR — 3D canvas orientation must not flip */
-html[lang="ar"] #vostok,
-html[lang="ar"] .vostok-layout,
-html[lang="ar"] .vostok-canvas-wrap,
-html[lang="ar"] .vostok-info,
-html[lang="ar"] .vostok-hint,
-html[lang="ar"] .vostok-labels,
-html[lang="ar"] .v-label {
-  direction: ltr;
+/* ── Vostok panel: always LTR grid so canvas=left, info=right in any language ── */
+html[lang="ar"] #panel-vostok { direction: ltr; }
+
+/* Panel header in Arabic: right-align text, keep LTR container */
+html[lang="ar"] #panel-vostok .panel-header {
+  direction: rtl;
+  text-align: right;
 }
-/* Info sidebar text should still read RTL in Arabic */
+html[lang="ar"] #panel-vostok .ph-eyebrow,
+html[lang="ar"] #panel-vostok .ph-title,
+html[lang="ar"] #panel-vostok .ph-sub { text-align: right; direction: rtl; }
+
+/* Info sidebar: RTL text inside an LTR grid cell */
 html[lang="ar"] .vostok-info {
   direction: rtl;
   text-align: right;
 }
+html[lang="ar"] .vi-stat-block h3,
+html[lang="ar"] .vi-parts h3 { text-align: right; }
+
+/* Stat rows: label on left, value on right (for RTL reading: label is "right" visually) */
+html[lang="ar"] .vi-stat { flex-direction: row-reverse; }
 html[lang="ar"] .vi-stat strong { text-align: left; }
-html[lang="ar"] .vi-fact { border-left: none; border-right: 3px solid var(--amber); }
-html[lang="ar"] .vostok-hint { letter-spacing: .02em; }
+
+/* Parts list: dot on right for RTL */
+html[lang="ar"] .vi-part { flex-direction: row-reverse; text-align: right; }
+
+/* Fact box: amber border on right */
+html[lang="ar"] .vi-fact { border-left: none; border-right: 3px solid var(--amber); flex-direction: row-reverse; text-align: right; }
+
+/* Hint and labels stay LTR */
+html[lang="ar"] .vostok-hint,
+html[lang="ar"] .vostok-labels,
+html[lang="ar"] .v-label { direction: ltr; }
 </style>
 </head>
 <body>
