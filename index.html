@@ -870,7 +870,23 @@ html[lang="ar"] .ph-title { font-size: clamp(1.8rem, 3.5vw, 3rem); }
   .vostok-layout { grid-template-columns: 1fr; height: auto; }
   .vostok-canvas-wrap { height: 55vw; min-height: 300px; }
 }
-html[lang="ar"] .vostok-layout { grid-template-columns: 300px 1fr; }
+/* Vostok panel is always LTR — 3D canvas orientation must not flip */
+html[lang="ar"] #vostok,
+html[lang="ar"] .vostok-layout,
+html[lang="ar"] .vostok-canvas-wrap,
+html[lang="ar"] .vostok-info,
+html[lang="ar"] .vostok-hint,
+html[lang="ar"] .vostok-labels,
+html[lang="ar"] .v-label {
+  direction: ltr;
+}
+/* Info sidebar text should still read RTL in Arabic */
+html[lang="ar"] .vostok-info {
+  direction: rtl;
+  text-align: right;
+}
+html[lang="ar"] .vi-stat strong { text-align: left; }
+html[lang="ar"] .vi-fact { border-left: none; border-right: 3px solid var(--amber); }
 html[lang="ar"] .vostok-hint { letter-spacing: .02em; }
 </style>
 </head>
@@ -1314,57 +1330,57 @@ html[lang="ar"] .vostok-hint { letter-spacing: .02em; }
       <div class="vostok-layout">
         <div class="vostok-canvas-wrap">
           <canvas id="vostok-canvas"></canvas>
-          <div class="vostok-hint">⟳ Drag to rotate &nbsp;·&nbsp; Scroll to zoom</div>
+          <div class="vostok-hint" id="vostok-hint">⟳ Drag to rotate &nbsp;·&nbsp; Scroll to zoom</div>
           <div class="vostok-labels" id="vostok-labels"></div>
         </div>
-        <aside class="vostok-info">
+        <aside class="vostok-info" id="vostok-info">
           <div class="vi-stat-block">
-            <h3>Mission Specs</h3>
-            <div class="vi-stat"><span>Launch date</span><strong>April 12, 1961</strong></div>
-            <div class="vi-stat"><span>Total mass</span><strong>4,725 kg</strong></div>
-            <div class="vi-stat"><span>Total length</span><strong>4.4 m</strong></div>
-            <div class="vi-stat"><span>Capsule diameter</span><strong>2.43 m</strong></div>
-            <div class="vi-stat"><span>Orbit altitude</span><strong>169 – 327 km</strong></div>
-            <div class="vi-stat"><span>Orbital period</span><strong>89.1 min</strong></div>
-            <div class="vi-stat"><span>Mission duration</span><strong>108 min</strong></div>
-            <div class="vi-stat"><span>Chief designer</span><strong>Sergei Korolev</strong></div>
+            <h3 id="vi-specs-title">Mission Specs</h3>
+            <div class="vi-stat"><span id="vi-s1">Launch date</span><strong>April 12, 1961</strong></div>
+            <div class="vi-stat"><span id="vi-s2">Total mass</span><strong>4,725 kg</strong></div>
+            <div class="vi-stat"><span id="vi-s3">Total length</span><strong>4.4 m</strong></div>
+            <div class="vi-stat"><span id="vi-s4">Capsule diameter</span><strong>2.43 m</strong></div>
+            <div class="vi-stat"><span id="vi-s5">Orbit altitude</span><strong>169 – 327 km</strong></div>
+            <div class="vi-stat"><span id="vi-s6">Orbital period</span><strong>89.1 min</strong></div>
+            <div class="vi-stat"><span id="vi-s7">Mission duration</span><strong>108 min</strong></div>
+            <div class="vi-stat"><span id="vi-s8">Chief designer</span><strong>Sergei Korolev</strong></div>
           </div>
 
           <div class="vi-parts">
-            <h3>Key Components</h3>
+            <h3 id="vi-parts-title">Key Components</h3>
             <div class="vi-part">
               <div class="vi-part-dot" style="background:#d4c8a0"></div>
               <div>
-                <strong>Descent Module (Sharik)</strong>
-                <p>Spherical capsule, 2.3 m diameter. Ablative heat shield protected it during reentry at 8G. Gagarin ejected and parachuted separately.</p>
+                <strong id="vi-p1-name">Descent Module (Sharik)</strong>
+                <p id="vi-p1-desc">Spherical capsule, 2.3 m diameter. Ablative heat shield protected it during reentry at 8G. Gagarin ejected and parachuted separately.</p>
               </div>
             </div>
             <div class="vi-part">
               <div class="vi-part-dot" style="background:#4a7a40"></div>
               <div>
-                <strong>Instrument Module</strong>
-                <p>Houses fuel tanks, life support, batteries, and communication systems. Jettisoned before reentry and burns up in the atmosphere.</p>
+                <strong id="vi-p2-name">Instrument Module</strong>
+                <p id="vi-p2-desc">Houses fuel tanks, life support, batteries, and communication systems. Jettisoned before reentry and burns up in the atmosphere.</p>
               </div>
             </div>
             <div class="vi-part">
               <div class="vi-part-dot" style="background:#666"></div>
               <div>
-                <strong>TDU-1 Retrorocket</strong>
-                <p>Fired for 42 seconds to slow the craft for deorbit. Produced ~1,600 kg thrust. A malfunction caused a terrifying 10-minute spin on reentry.</p>
+                <strong id="vi-p3-name">TDU-1 Retrorocket</strong>
+                <p id="vi-p3-desc">Fired for 42 seconds to slow the craft for deorbit. Produced ~1,600 kg thrust. A malfunction caused a terrifying 10-minute spin on reentry.</p>
               </div>
             </div>
             <div class="vi-part">
               <div class="vi-part-dot" style="background:#bbb"></div>
               <div>
-                <strong>Antenna Array</strong>
-                <p>Four whip antennas for voice communication with ground control and telemetry. Allowed real-time monitoring of Gagarin's vitals.</p>
+                <strong id="vi-p4-name">Antenna Array</strong>
+                <p id="vi-p4-desc">Four whip antennas for voice communication with ground control and telemetry. Allowed real-time monitoring of Gagarin's vitals.</p>
               </div>
             </div>
           </div>
 
           <div class="vi-fact">
             <div class="vi-fact-icon">⚠️</div>
-            <p><strong>Classified secret for years:</strong> Gagarin ejected from the capsule at 7,000 m altitude and parachuted separately. The capsule couldn't safely land with a pilot inside — but this had to be kept quiet to qualify the flight under aviation records.</p>
+            <p id="vi-fact-text"><strong id="vi-fact-label">Classified secret for years:</strong> Gagarin ejected from the capsule at 7,000 m altitude and parachuted separately. The capsule couldn't safely land with a pilot inside — but this had to be kept quiet to qualify the flight under aviation records.</p>
           </div>
         </aside>
       </div>
@@ -2678,6 +2694,55 @@ function initVostok() {
     vostokScene.add(vostokEarth);
   })();
 
+  // ── Background planets ──
+  (function () {
+    // Moon — grey cratered sphere, far upper-right
+    const moonC = document.createElement('canvas'); moonC.width = 512; moonC.height = 512;
+    const mc = moonC.getContext('2d');
+    mc.fillStyle = '#888'; mc.fillRect(0,0,512,512);
+    mc.fillStyle = 'rgba(60,60,60,0.6)';
+    [[80,120,28],[200,80,18],[310,200,22],[140,340,15],[380,300,12],[250,420,10],[60,430,8],[440,140,9]].forEach(([x,y,r]) => { mc.beginPath(); mc.arc(x,y,r,0,Math.PI*2); mc.fill(); });
+    mc.fillStyle = 'rgba(140,140,140,0.3)';
+    [[80,120,26],[200,80,16],[310,200,20]].forEach(([x,y,r]) => { mc.beginPath(); mc.arc(x,y,r,0,Math.PI*2); mc.fill(); });
+    const moonTex = new THREE.CanvasTexture(moonC);
+    const moon = new THREE.Mesh(new THREE.SphereGeometry(7, 40, 40), new THREE.MeshStandardMaterial({ map: moonTex, roughness: 0.96, metalness: 0, envMapIntensity: 0.1 }));
+    moon.position.set(55, 28, -90);
+    vostokScene.add(moon);
+
+    // Saturn — ringed gas giant, left-mid background
+    const satC = document.createElement('canvas'); satC.width = 512; satC.height = 512;
+    const sc = satC.getContext('2d');
+    const sg = sc.createLinearGradient(0,0,0,512);
+    sg.addColorStop(0,'#c8a96e'); sg.addColorStop(0.3,'#e0c080'); sg.addColorStop(0.5,'#d4a850'); sg.addColorStop(0.7,'#c89040'); sg.addColorStop(1,'#a87828');
+    sc.fillStyle = sg; sc.fillRect(0,0,512,512);
+    sc.strokeStyle = 'rgba(120,80,30,0.4)'; sc.lineWidth = 6;
+    for (let y = 80; y < 512; y += 28) { sc.beginPath(); sc.moveTo(0,y); sc.lineTo(512,y); sc.stroke(); }
+    const satTex = new THREE.CanvasTexture(satC);
+    const saturn = new THREE.Group();
+    saturn.add(new THREE.Mesh(new THREE.SphereGeometry(10, 48, 48), new THREE.MeshStandardMaterial({ map: satTex, roughness: 0.75, metalness: 0 })));
+    // Rings (flat torus, semi-transparent)
+    const ringMat = new THREE.MeshStandardMaterial({ color: 0xd4a840, roughness: 0.9, metalness: 0, transparent: true, opacity: 0.55, side: THREE.DoubleSide });
+    [13.5, 16, 18.5, 20.5].forEach((r, i) => {
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(r, 0.9 + i*0.3, 4, 80), ringMat);
+      ring.rotation.x = Math.PI/2; saturn.add(ring);
+    });
+    saturn.position.set(-70, 8, -110);
+    saturn.rotation.x = 0.32; saturn.rotation.z = 0.18;
+    vostokScene.add(saturn);
+
+    // Mars — rusty red, small, far right
+    const marC = document.createElement('canvas'); marC.width = 256; marC.height = 256;
+    const marc = marC.getContext('2d');
+    const mg = marc.createLinearGradient(0,0,256,256);
+    mg.addColorStop(0,'#c1440e'); mg.addColorStop(0.5,'#d4561a'); mg.addColorStop(1,'#8c2c05');
+    marc.fillStyle = mg; marc.fillRect(0,0,256,256);
+    marc.fillStyle = 'rgba(80,20,5,0.35)';
+    [[60,80,22],[140,50,18],[190,160,14],[100,200,10]].forEach(([x,y,r]) => { marc.beginPath(); marc.arc(x,y,r,0,Math.PI*2); marc.fill(); });
+    const mars = new THREE.Mesh(new THREE.SphereGeometry(5, 32, 32), new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(marC), roughness: 0.9, metalness: 0 }));
+    mars.position.set(80, -18, -75);
+    vostokScene.add(mars);
+  })();
+
   // ── Camera ──
   vostokCamera = new THREE.PerspectiveCamera(40, W / H, 0.1, 800);
   vostokCamera.position.set(0, 0, vostokZoom);
@@ -2959,6 +3024,51 @@ function initVostok() {
   // Store refs for animate loop
   ship.userData.particles = { geo: pGeo, vel: pVel, life: pLife, col: pCol2, mat: pMat, reset: resetParticle, count: PARTICLE_COUNT };
 
+  // ═══ EXTRA DETAIL ═══
+  // Umbilical connector panel on capsule side
+  const umbDir = new THREE.Vector3(-0.75, -0.1, 0.66).normalize();
+  const umbSurf = new THREE.Vector3(0, 1.85, 0).clone().add(umbDir.clone().multiplyScalar(1.17));
+  const umb = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.1, 0.06), mNozzle);
+  umb.position.copy(umbSurf); umb.lookAt(umbSurf.clone().add(umbDir)); ship.add(umb);
+  // 3 connector pins
+  for (let i = -1; i <= 1; i++) {
+    const pin = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.05, 6), mRing);
+    pin.position.copy(umbSurf.clone().add(umbDir.clone().multiplyScalar(0.04)).add(new THREE.Vector3(i*0.045, 0, 0)));
+    pin.setRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(Y0, umbDir));
+    ship.add(pin);
+  }
+
+  // 3 horizontal ribbing bands on upper equipment module
+  [-0.05, 0.28, 0.62].forEach(y => {
+    addMesh(new THREE.TorusGeometry(0.72 - y*0.18, 0.018, 6, 64), mRing, 0, y, 0, Math.PI/2, 0, 0);
+  });
+
+  // Access hatch on the equipment module side
+  const hatchX = 1.17, hatchY = -0.55, hatchZ = 0.0;
+  addMesh(new THREE.BoxGeometry(0.08, 0.38, 0.22), mModule, hatchX, hatchY, hatchZ);
+  addMesh(new THREE.BoxGeometry(0.09, 0.42, 0.015), mRing, hatchX+0.01, hatchY, 0.115);
+  addMesh(new THREE.BoxGeometry(0.09, 0.42, 0.015), mRing, hatchX+0.01, hatchY, -0.115);
+  // Hatch latch
+  addMesh(new THREE.CylinderGeometry(0.022, 0.022, 0.06, 8), mNozzle, hatchX+0.05, hatchY+0.12, 0);
+
+  // Retrorocket longitudinal stringers (4 vertical ribs on the body)
+  for (let i = 0; i < 4; i++) {
+    const a = (i/4)*Math.PI*2 + Math.PI/8;
+    const rib = addMesh(new THREE.BoxGeometry(0.018, 0.42, 0.045), mStrut, Math.cos(a)*0.88, -2.22, Math.sin(a)*0.88);
+    rib.rotation.y = -a;
+  }
+
+  // Solar sensor balls (3 small white spheres on capsule) — navigation references
+  [
+    new THREE.Vector3(0, -1, 0).normalize(),
+    new THREE.Vector3(0.7, 0.1, 0.7).normalize(),
+    new THREE.Vector3(-0.7, 0.1, -0.7).normalize(),
+  ].forEach(dir => {
+    const p = new THREE.Vector3(0, 1.85, 0).add(dir.clone().multiplyScalar(1.18));
+    addMesh(new THREE.SphereGeometry(0.055, 10, 10), mWindow, p.x, p.y, p.z);
+    addMesh(new THREE.TorusGeometry(0.055, 0.015, 6, 20), mNozzle, p.x, p.y, p.z, Math.PI/2, 0, 0);
+  });
+
   // ═══ ANTENNA ARRAY ═══
   const sCtr = new THREE.Vector3(0, 1.85, 0);
   [
@@ -3235,6 +3345,36 @@ function rebuildPanel(id, lang) {
   if (id === 'gagarin') {
     document.getElementById('gg-story')._built = false;
     buildGagarin(lang);
+  }
+
+  if (id === 'vostok') {
+    const ar = lang === 'ar';
+    const set = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+    set('vi-specs-title',  ar ? 'مواصفات المهمة'              : 'Mission Specs');
+    set('vi-parts-title',  ar ? 'المكونات الرئيسية'           : 'Key Components');
+    set('vi-s1',           ar ? 'تاريخ الإطلاق'               : 'Launch date');
+    set('vi-s2',           ar ? 'الكتلة الإجمالية'            : 'Total mass');
+    set('vi-s3',           ar ? 'الطول الكلي'                 : 'Total length');
+    set('vi-s4',           ar ? 'قطر الكبسولة'                : 'Capsule diameter');
+    set('vi-s5',           ar ? 'ارتفاع المدار'               : 'Orbit altitude');
+    set('vi-s6',           ar ? 'دورة المدار'                 : 'Orbital period');
+    set('vi-s7',           ar ? 'مدة المهمة'                  : 'Mission duration');
+    set('vi-s8',           ar ? 'المصمم الرئيسي'              : 'Chief designer');
+    set('vi-p1-name',      ar ? 'كبسولة الهبوط (شاريك)'      : 'Descent Module (Sharik)');
+    set('vi-p1-desc',      ar ? 'كبسولة كروية قطرها 2.3 م. درع حراري وقاها أثناء إعادة الدخول عند 8 جي. قفز غاغارين بالمظلة بشكل منفصل.' : 'Spherical capsule, 2.3 m diameter. Ablative heat shield protected it during reentry at 8G. Gagarin ejected and parachuted separately.');
+    set('vi-p2-name',      ar ? 'وحدة الأجهزة'               : 'Instrument Module');
+    set('vi-p2-desc',      ar ? 'تحتوي على خزانات الوقود ودعم الحياة والبطاريات وأنظمة الاتصالات. تُطلق قبل إعادة الدخول وتحترق في الغلاف الجوي.' : 'Houses fuel tanks, life support, batteries, and communication systems. Jettisoned before reentry and burns up in the atmosphere.');
+    set('vi-p3-name',      ar ? 'محرك التراجع TDU-1'         : 'TDU-1 Retrorocket');
+    set('vi-p3-desc',      ar ? 'اشتعل لمدة 42 ثانية لإبطاء المركبة للخروج من المدار. أنتج ~1,600 كجم دفعًا. تسبب عطل في دوران مرعب لمدة 10 دقائق أثناء إعادة الدخول.' : 'Fired for 42 seconds to slow the craft for deorbit. Produced ~1,600 kg thrust. A malfunction caused a terrifying 10-minute spin on reentry.');
+    set('vi-p4-name',      ar ? 'مصفوفة الهوائيات'           : 'Antenna Array');
+    set('vi-p4-desc',      ar ? 'أربعة هوائيات جلد للاتصال الصوتي مع مركز التحكم. أتاحت المراقبة الفورية لعلامات غاغارين الحيوية.' : 'Four whip antennas for voice communication with ground control and telemetry. Allowed real-time monitoring of Gagarin\'s vitals.');
+    set('vi-fact-label',   ar ? 'سر مصنف لسنوات:'            : 'Classified secret for years:');
+    const factEl = document.getElementById('vi-fact-text');
+    if (factEl) factEl.innerHTML = ar
+      ? `<strong id="vi-fact-label">سر مصنف لسنوات:</strong> قفز غاغارين من الكبسولة على ارتفاع 7,000 م وهبط بالمظلة بشكل منفصل. لم يكن بإمكان الكبسولة الهبوط بأمان مع الطيار داخلها — لكن كان يجب إخفاء ذلك لتأهيل الرحلة وفق سجلات الطيران.`
+      : `<strong id="vi-fact-label">Classified secret for years:</strong> Gagarin ejected from the capsule at 7,000 m altitude and parachuted separately. The capsule couldn't safely land with a pilot inside — but this had to be kept quiet to qualify the flight under aviation records.`;
+    const hint = document.getElementById('vostok-hint');
+    if (hint) hint.textContent = ar ? '⟳ اسحب للتدوير · مرّر للتكبير' : '⟳ Drag to rotate · Scroll to zoom';
   }
 
   if (id === 'sensation') {
