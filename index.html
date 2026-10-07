@@ -2724,7 +2724,7 @@ function initVostok() {
     for (let i = 0; i <= 16; i++) { ctx.beginPath(); ctx.moveTo(i*1024/16,0); ctx.lineTo(i*1024/16,512); ctx.stroke(); }
     for (let i = 0; i <= 8; i++) { ctx.beginPath(); ctx.moveTo(0,i*512/8); ctx.lineTo(1024,i*512/8); ctx.stroke(); }
     // "CCCP" marking in red
-    ctx.save(); ctx.font = 'bold 42px monospace'; ctx.fillStyle = '#cc2200'; ctx.letterSpacing='4px'; ctx.fillText('CCCP', 420, 160); ctx.restore();
+    ctx.save(); ctx.font = 'bold 42px monospace'; ctx.fillStyle = '#cc2200'; ctx.fillText('C C C P', 395, 160); ctx.restore();
     // Rivets
     ctx.fillStyle = 'rgba(50,55,45,0.5)';
     for (let x = 1024/32; x < 1024; x += 1024/16) for (let y = 512/16; y < 512; y += 512/8) { ctx.beginPath(); ctx.arc(x,y,1.8,0,Math.PI*2); ctx.fill(); }
