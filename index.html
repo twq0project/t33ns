@@ -1828,36 +1828,27 @@ function getPhase(day) {
   return PHASES.find(p => day >= p.from && day <= p.to) || PHASES[PHASES.length - 1];
 }
 
-function buildMetricGrid(day, lang) {
-  if (lang === undefined) lang = typeof currentLang !== 'undefined' ? currentLang : 'en';
+function buildMetricGrid(day) {
   const grid = document.getElementById('metric-grid');
-  const ar = lang === 'ar';
-  const arStatus = ar && typeof AR !== 'undefined' ? AR.metricStatus : null;
-  grid.innerHTML = METRICS.map(m => {
-    const name = arStatus && arStatus[m.id] ? arStatus[m.id].name : m.name;
-    const unit = arStatus && arStatus[m.id] ? arStatus[m.id].unit : m.unit;
-    return `
+  if (!grid._built) {
+    grid.innerHTML = METRICS.map(m => `
       <div class="metric-card" id="mc-${m.id}">
         <div class="mc-top">
           <span class="mc-icon">${m.icon}</span>
-          <span class="mc-name">${name}</span>
+          <span class="mc-name">${m.name}</span>
           <span class="mc-status" id="mcs-${m.id}"></span>
         </div>
         <div class="mc-val" id="mcv-${m.id}">—</div>
-        <div class="mc-unit">${unit}</div>
+        <div class="mc-unit">${m.unit}</div>
         <div class="mc-bar"><div class="mc-bar-fill" id="mcb-${m.id}"></div></div>
-      </div>`;
-  }).join('');
-  grid._built = true;
+      </div>`).join('');
+    grid._built = true;
+  }
   METRICS.forEach(m => {
     const val = m.calc(day);
     const sev = m.severity(val);
     document.getElementById('mc-' + m.id).className = 'metric-card ' + sev;
-    let statusTxt = m.statusLabel(val);
-    if (arStatus && arStatus.metricStat && arStatus.metricStat[m.id]) {
-      statusTxt = arStatus.metricStat[m.id][sev] || statusTxt;
-    }
-    document.getElementById('mcs-' + m.id).textContent = statusTxt;
+    document.getElementById('mcs-' + m.id).textContent = m.statusLabel(val);
     document.getElementById('mcv-' + m.id).textContent =
       m.decimals > 0 ? val.toFixed(m.decimals) : Math.round(val);
     const fill = document.getElementById('mcb-' + m.id);
@@ -3416,12 +3407,6 @@ function rebuildPanel(id, lang) {
 
   if (id === 'timeline') {
     const slider = document.getElementById('mission-slider');
-    const markLabels = lang === 'ar'
-      ? AR.clock.marks
-      : ['D1','W1','M1','M2','M3','M4','M5','M6'];
-    document.querySelectorAll('.clock-marks span').forEach((el, i) => {
-      if (markLabels[i] !== undefined) el.textContent = markLabels[i];
-    });
     updateTimelineAr(parseInt(slider.value), lang);
   }
 
@@ -3520,7 +3505,7 @@ function updateTimelineAr(d, lang) {
     document.getElementById('clock-phase').textContent = phase.name;
     document.getElementById('clock-narrative').textContent = phase.text;
   }
-  buildMetricGrid(d, lang);
+  buildMetricGrid(d);
 }
 
 // Patch selectSystem to use Arabic data
